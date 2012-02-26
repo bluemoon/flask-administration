@@ -1,0 +1,7 @@
+include LICENSE *.py
+recursive-include flask_adminitizer *
+recursive-include docs *
+recursive-exclude docs *.pyc
+recursive-exclude docs *.pyo
+prune docs/_build
+prune docs/_themes/.git
