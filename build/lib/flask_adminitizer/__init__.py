@@ -10,28 +10,27 @@ import types
 import flask
 from flask import flash, render_template, redirect, request, url_for
 
-
-def create_adminitizer_blueprint(view_decorator=None, template_folder=None,
-                                 static_folder=None):
-    if not view_decorator:
-        def view_decorator(f):
-            @wraps(f)
-            def wrapper(*args, **kwds):
-                return f(*args, **kwds)
-            return wrapper
+def view_decorator(f):
+    @wraps(f)
+    def wrapper(*args, **kwds):
+        return f(*args, **kwds)
+    return wrapper
     
+def create_adminitizer_blueprint(view_decorator=view_decorator, 
+                                 template_folder=None,
+                                 static_folder=None):
     if not template_folder:
         template_folder = os.path.join(
             _get_admin_extension_dir(), 'templates')
     if not static_folder:
         static_folder = os.path.join(
             _get_admin_extension_dir(), 'static')
-    print static_folder, template_folder
+
     admin_blueprint = flask.Blueprint('adminitizer', 
                                   'flask.ext.adminitizer',
                                   static_folder=static_folder, 
                                   template_folder=template_folder)
-                                  
+    
     
     def get_model_url_key(model_instance):
         """Helper function that turns a set of model keys into a
@@ -44,21 +43,23 @@ def create_adminitizer_blueprint(view_decorator=None, template_folder=None,
     def create_index_view():
         @view_decorator
         def index():
-            """Landing page view for admin module
-            """
+            """Landing page view for admin module"""
             return render_template('admin/index.html')
-                #model_names=datastore.list_model_names())
         return index
         
     def create_log_view():
         @view_decorator
-        def index():
-            return render_template('admin/log.html')
-                #model_names=datastore.list_model_names())
-        return index
+        def log():
+            LOG_FILE = '/var/log/system.log'
+            MAX_LEN = -100
+            with open(LOG_FILE, 'r') as f:
+                log_buffer = f.readlines()
+                return render_template('admin/log.html', log_buffer=log_buffer[MAX_LEN:])
+
+        return log
         
     admin_blueprint.add_url_rule('/', 'index', view_func=create_index_view())
-    admin_blueprint.add_url_rule('/log', 'index', view_func=create_index_view())
+    admin_blueprint.add_url_rule('/log/', 'index', view_func=create_log_view())
 
     return admin_blueprint
     

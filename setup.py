@@ -2,9 +2,9 @@ from setuptools import setup
 
 
 setup(
-    name='Flask-Adminitizer',
-    version='0.0.7',
-    packages=['flask_adminitizer'],
+    name='Flask-Adminitizr',
+    version='0.0.9',
+    packages=['flask_adminitizr'],
     include_package_data=True,
     zip_safe=False,
     platforms='any',

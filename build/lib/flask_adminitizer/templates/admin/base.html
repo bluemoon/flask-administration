@@ -68,6 +68,9 @@
                     <b class="caret"></b>
                   </a>
                   <ul class="dropdown-menu">
+                    <li>
+                        <a href="{{ url_for('.log') }}">Default</a>
+                    </li>
                     {% for model in model_names|sort %}
                       <li>
                         <a href="{{ url_for('.list', model_name=model, page=1) }}">{{ model|lower }}</a>
