@@ -3,8 +3,6 @@ from flask.ext import adminitizr
 
 def create_app(database_uri='sqlite://'):
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
-    app.config['SECRET_KEY'] = 'not secure'
     admin_blueprint = adminitizr.create_adminitizr_blueprint()
     app.register_blueprint(admin_blueprint, url_prefix='/admin')
 

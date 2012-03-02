@@ -1,5 +1,5 @@
 include LICENSE *.py
-recursive-include flask_adminitizer *
+recursive-include flask_administration *
 recursive-include docs *
 recursive-exclude docs *.pyc
 recursive-exclude docs *.pyo
