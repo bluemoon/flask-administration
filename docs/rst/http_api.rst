@@ -88,9 +88,9 @@ List all of the events::
 	
 	/events
 
-List with page limits of 25 per page on page 3::
+List with page limits of 25 per page on page 3 (un-implemented)::
 	
-	/events?limit=25&page=3
+	/events?limit=25&page=3 
 
 List between two times::
 	
