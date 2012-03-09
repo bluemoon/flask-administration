@@ -14,7 +14,14 @@ Parameters
 JSON Format
 -------------
 
-This uses the same variables we outlined above::
+This is the format we will use for JSON, this is the example for a singular event::
+
+	{
+	  '_n' : 'event name',
+	  '_p' : 'person'
+	}
+
+Or for multiple events we may use a list of dictionaries::
 
 	[
 	  {  
@@ -72,3 +79,20 @@ Endpoint(POST): /e
 Accepts encoded forms and JSON with the key used in a manner such that the URL below is the URL that should be POSTed to.::
 
 	/e?_k=KEY
+
+
+Endpoint(GET): /events
+-----------------------
+
+List all of the events::
+	
+	/events
+
+List with page limits of 25 per page on page 3::
+	
+	/events?limit=25&page=3
+
+List between two times::
+	
+	/events?start=1231292609.140918&end=1331292609.140918
+
