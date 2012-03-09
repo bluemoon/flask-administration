@@ -2,23 +2,31 @@ HTTP API
 ==========
 
 Parameters:
-_k : Key, keeps different API services unique and easier to sort
-_n : Name of event you want to record, this has a limit of 255 characters
-_p : The identity of the person doing the event, this will likely be the users email address or possibly a unique id, has a limit of 255 characters
-_t : Timestamp of the event in the unix epoch format, used to keep events unique. This should only be used if you want to create an event in the past. 
-_d : Data encoded in base64 format, this should only be used with the /events endpoint
+------------
+
+* **_k** : Key, keeps different API services unique and easier to sort
+* **_n** : Name of event you want to record, this has a limit of 255 characters
+* **_p** : The identity of the person doing the event, this will likely be the users email address or possibly a unique id, has a limit of 255 characters
+* **_t** : Timestamp of the event in the unix epoch format, used to keep events unique. This should only be used if you want to create an event in the past. 
+* **_d** : Data encoded in base64 format, this should only be used with the /events endpoint
 
 
 JSON Format:
+-------------
 
- [{  
-   ‘_n’ : ‘event name’,
-   ‘_p’ : ‘person’,
-   ‘customProperty’ : ‘CustomDataHere’
- },
- {
-   ‘_n’ : ‘second event name’
- }]
+This uses the same variables we outlined above::
+
+	[
+	  {  
+	    '_n' : 'event name',
+	    '_p' : 'person',
+	    'customProperty' : 'CustomDataHere'
+	  },
+	  {
+	    '_n' : 'second event name'
+	  }
+	]
+
 Response:
 
 As this is intended to be a very lightweight protocol, the results are simply sent back in the text/plain mimetype. All endpoints follow this response.
