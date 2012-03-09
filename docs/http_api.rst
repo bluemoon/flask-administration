@@ -28,34 +28,46 @@ This uses the same variables we outlined above::
 	]
 
 Response:
+----------
 
-As this is intended to be a very lightweight protocol, the results are simply sent back in the text/plain mimetype. All endpoints follow this response.
-1 - Data was logged
-0 - Error, data was not logged
+As this is intended to be a very lightweight event system, the results are simply sent back in the text/plain mimetype. All endpoints follow this response.
+
+* **1** - Data was logged
+* **0** - Error, data was not logged
 
 
 Endpoint(GET): /e
+------------------
 
-parameters: 
-The event endpoint is for sending single events to a GET http endpoint
-required: _n
+Parameters: 
+^^^^^^^^^^^^
+
+required: **_n**
+
 Any other properties you'd like:
-such as in this example, gender=male
 
-/e?_p=bob@bob.com&_n=Signup&gender=male&_k=KEY
+such as in this example, gender=male::
+
+	/e?_p=bob@bob.com&_n=Signup&gender=male&_k=KEY
 
 This request translates out to have the values, 
-_p         - bob@bob.com
-_n         - Signup
-_k         - KEY
-gender     - male
+
+* _p         - bob@bob.com
+* _n         - Signup
+* _k         - KEY
+* gender     - male
+
 Sending data as base64:
-/e?_d=eyJldmVudCI6ICJnYW1lIiwgInBy<... truncated>&_k=KEY  
-If you choose to send the data in this manner it must adhere to the JSON format outlined above and then be encoded in base64.
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you choose to send the data in this manner it must adhere to the JSON format outlined above and then be encoded in base64.::
+
+	/e?_d=eyJldmVudCI6ICJnYW1lIiwgInBy<... truncated>&_k=KEY  
+
 
 
 Endpoint(POST): /e
-
+-------------------
 parameters:
 Accepts encoded forms and JSON with the key used in a manner such that the URL below is the URL that should be POSTed to.
 
