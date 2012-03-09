@@ -16,11 +16,13 @@ import flask
 import json
 import time
 import base64
+from juggernaut import Juggernaut
 
 DATA = '_d'
 KEY = '_k'
 EVENT = '_n'
 TIME = '_t'
+IDENT = '_p'
 
 event_blueprint = Blueprint('event_driver', 
                          'flask.ext.administration.event_driver',
@@ -28,6 +30,9 @@ event_blueprint = Blueprint('event_driver',
                           template_folder=template_folder)
 
 event_blueprint.db = mongoengine.connect(db='events')
+jug = Juggernaut()
+
+
 
 
 class Event(mongoengine.Document):
@@ -37,6 +42,12 @@ class Event(mongoengine.Document):
     identity = StringField()
     custom = DictField()
 
+    @classmethod
+    def post_save(cls, sender, document, *args, **kwargs):
+        result = json.dumps(document, default=encode_model)
+        jug.publish('event', result)
+
+
 
 def store_event(event_dict):
     """ Stores an event
@@ -45,12 +56,13 @@ def store_event(event_dict):
     """
     custom_properties = dict((key, value) for key, value in \
         event_dict.iteritems() if not key.startswith('_'))
-    internal_properties = dict((key, value) for key, value in \
-        event_dict.iteritems() if key.startswith('_'))
 
     converted = [{k: v} for k, v in custom_properties.items()]
 
-    e = Event(name=event_dict.get(EVENT), time=time.time(), custom=custom_properties)
+    e = Event(name=event_dict.get(EVENT), 
+              time=time.time(), 
+              identity=event_dict.get(IDENT),
+              custom=custom_properties)
     e.save()
 
 
@@ -114,3 +126,6 @@ def events():
 
     result = json.dumps(events, default=encode_model)
     return Response(response=result)
+
+
+mongoengine.signals.post_save.connect(Event.post_save, sender=Event)

@@ -13,11 +13,7 @@ import time
     
 monkey.patch_all()
 jug = Juggernaut()
-    
-def start_juggernaut():
-    while True:
-        time.sleep(0.5)
-        #print 'hi'
+
 
 def start_webserver():
     app = Flask(__name__)
@@ -37,6 +33,7 @@ def start_file_monitor(follow_file, idx):
             continue
         line = escape(line)
         jug.publish('logger-{}'.format(idx), line)
+
 
 if __name__ == '__main__':
     file_monitors = ['/var/log/kernel.log', '/var/log/system.log']

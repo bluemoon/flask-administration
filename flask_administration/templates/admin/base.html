@@ -45,15 +45,13 @@
                   <a href="#"
                      class="dropdown-toggle"
                      data-toggle="dropdown">
-                    models
+                    metrics
                     <b class="caret"></b>
                   </a>
                   <ul class="dropdown-menu">
-                    {% for model in model_names|sort %}
-                      <li>
-                        <a href="{{ url_for('.list', model_name=model, page=1) }}">{{ model|lower }}</a>
-                      </li>
-                    {% endfor %}
+                    <li>
+                      <a href="/admin/">Timeline</a>
+                    </li>
                   </ul>
                 </li>
                 
@@ -74,7 +72,6 @@
                     
                   </ul>
                 </li>
-                
               </ul>
             </div>
           </div>
