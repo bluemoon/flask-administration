@@ -94,5 +94,5 @@ List with page limits of 25 per page on page 3::
 
 List between two times::
 	
-	/events?start=1231292609.140918&end=1331292609.140918
+	/events?before=1231292609.140918&after=1331292609.140918
 
