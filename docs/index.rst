@@ -7,10 +7,20 @@ Welcome to Flask-Administration's documentation!
 ================================================
 
 Contents:
+-----------
 
 .. toctree::
    :maxdepth: 2
 
+
+
+API/Reference Docs
+--------------------
+
+.. toctree::
+   :maxdepth: 2
+
+   http_api
 
 
 Indices and tables
