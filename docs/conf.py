@@ -92,12 +92,18 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 sys.path.insert(0, os.path.abspath('../flask_administration'))
+sys.path.append(os.path.abspath('_themes'))
+html_theme_path = ['_themes']
+html_theme = 'bootstrap'
+
+# Optional. Use a shorter name to conserve nav. bar space.
+html_short_title = 'Flask-Administration'
 #html_theme_path = ['_themes']
-html_theme = 'default'
+#html_theme = 'default'
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-#html_theme_options = {}
+#html_theme_options = {'collapsiblesidebar':True}
 
 # Add any paths that contain custom themes here, relative to this directory.
 
