@@ -28,7 +28,7 @@ import sys, os
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.intersphinx', 'sphinx.ext.todo', 'sphinx.ext.coverage', 'sphinx.ext.viewcode']
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+#templates_path = ['_templates']
 
 # The suffix of source filenames.
 source_suffix = '.rst'
@@ -64,7 +64,7 @@ release = '0.0.12'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build']
+#exclude_patterns = ['_build']
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 #default_role = None
@@ -166,7 +166,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'Flask-Administrationdoc'
+htmlhelp_basename = 'Flask-Administration'
 
 
 # -- Options for LaTeX output --------------------------------------------------
