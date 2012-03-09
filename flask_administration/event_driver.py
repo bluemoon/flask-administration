@@ -86,6 +86,7 @@ def e():
     store_event(request.args)
     return jsonify(status=1)
 
+
 @event_blueprint.route("/events")
 def events():
     """
