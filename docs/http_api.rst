@@ -1,5 +1,5 @@
-HTTP Specification
-
+HTTP API
+==========
 
 Parameters:
 _k : Key, keeps different API services unique and easier to sort
