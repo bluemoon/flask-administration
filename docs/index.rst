@@ -11,6 +11,7 @@ Contents:
    rst/installation
    rst/usage
    rst/manual_docs
+   rst/examples
 
 
 
