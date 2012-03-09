@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='Flask-Administration',
-    version='0.0.12',
+    version='0.0.13',
     packages=['flask_administration'],
     include_package_data=True,
     zip_safe=False,

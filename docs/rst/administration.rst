@@ -13,6 +13,17 @@ Flask-Administration Modules
     :special-members:
     :inherited-members:
 
+:mod:`event_driver`
+--------------------
+
+.. automodule:: flask_administration.event_driver
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    :private-members:
+    :special-members:
+    :inherited-members:
+
 :mod:`orm`
 -----------------
 
