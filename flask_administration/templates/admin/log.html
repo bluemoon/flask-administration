@@ -18,12 +18,11 @@ Realtime Log Monitor
             </div>
         </div>
     </div>
-    <script type="text/javascript" src="{{ static('js/jquery.min.js') }}"></script>
     <script type="text/javascript" src="http://localhost:8080/application.js"></script>
     <script type=text/javascript>
     var jug = new Juggernaut();
     var $data = $('#data')
-    jug.subscribe('logger', function(data) {
+    jug.subscribe('logger-{{id}}', function(data) {
         $data.append($('<p/>').text(data));
         $data.scrollTop($data[0].scrollHeight);
     });

@@ -1,16 +1,52 @@
 #!/usr/bin/python
-import argparse
+from flask import escape
+from juggernaut import Juggernaut
+from flask import Flask
+from flask.ext.administration import event_driver, index
 
-parser = argparse.ArgumentParser(description='Process some integers.')
-#parser.add_argument('integers', metavar='N', type=int, nargs='+',
-#                   help='an integer for the accumulator')
-#parser.add_argument('--sum', dest='accumulate', action='store_const',
-#                   const=sum, default=max,
-#                   help='sum the integers (default: find the max)')
+import gevent
+from gevent import monkey
+from gevent.wsgi import WSGIServer
+from werkzeug.contrib.fixers import ProxyFix
+    
+import time
+    
+monkey.patch_all()
+jug = Juggernaut()
+    
+def start_juggernaut():
+    while True:
+        time.sleep(0.5)
+        #print 'hi'
 
-args = parser.parse_args()
+def start_webserver():
+    app = Flask(__name__)
+    app.register_blueprint(event_driver.event_blueprint)
+    app.register_blueprint(index.admin, url_prefix='/admin')
+    app.wsgi_app = ProxyFix(app.wsgi_app)
+    http_server = WSGIServer(('127.0.0.1', 5003), app)
+    http_server.serve_forever()
 
-if __name__ == '__main__': 
-    from Admin import app
-    app.debug = True
-    app.run('127.0.0.1', 5003)
+def start_file_monitor(follow_file, idx):
+    follow_file = open(follow_file, 'r')
+    follow_file.seek(0, 2)
+    while True:
+        line = follow_file.readline()
+        if not line:
+            time.sleep(0.1)
+            continue
+        line = escape(line)
+        jug.publish('logger-{}'.format(idx), line)
+
+if __name__ == '__main__':
+    file_monitors = ['/var/log/kernel.log', '/var/log/system.log']
+    jobs = []
+    try:
+        jobs.append(gevent.spawn(start_webserver))
+        for idx, monitor in enumerate(file_monitors):
+            jobs.append(gevent.spawn(start_file_monitor, monitor, idx))
+        gevent.joinall(jobs)
+    except KeyboardInterrupt:
+        raise Exception
+
+    #http_server.serve_forever()
