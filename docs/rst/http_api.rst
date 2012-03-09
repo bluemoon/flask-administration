@@ -1,7 +1,7 @@
 HTTP API
 ==========
 
-Parameters:
+Parameters
 ------------
 
 * **_k** : Key, keeps different API services unique and easier to sort
@@ -11,7 +11,7 @@ Parameters:
 * **_d** : Data encoded in base64 format, this should only be used with the /events endpoint
 
 
-JSON Format:
+JSON Format
 -------------
 
 This uses the same variables we outlined above::
@@ -27,7 +27,7 @@ This uses the same variables we outlined above::
 	  }
 	]
 
-Response:
+Response
 ----------
 
 As this is intended to be a very lightweight event system, the results are simply sent back in the text/plain mimetype. All endpoints follow this response.
