@@ -20,7 +20,7 @@ API/Reference Docs
 .. toctree::
    :maxdepth: 2
 
-   http_api
+   http_api.rst
 
 
 Indices and tables
