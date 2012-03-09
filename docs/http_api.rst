@@ -68,7 +68,7 @@ If you choose to send the data in this manner it must adhere to the JSON format 
 
 Endpoint(POST): /e
 -------------------
-parameters:
-Accepts encoded forms and JSON with the key used in a manner such that the URL below is the URL that should be POSTed to.
 
-/events?_k=KEY
+Accepts encoded forms and JSON with the key used in a manner such that the URL below is the URL that should be POSTed to.::
+
+	/e?_k=KEY
