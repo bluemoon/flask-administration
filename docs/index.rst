@@ -9,7 +9,6 @@ Contents:
    :maxdepth: 2
    
    rst/installation
-   rst/usage
    rst/manual_docs
    rst/examples
 
