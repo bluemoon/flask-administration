@@ -9,7 +9,6 @@ Contents:
    :maxdepth: 2
    
    rst/installation
-   rst/manual_docs
    rst/examples
 
 
@@ -20,7 +19,7 @@ API/Reference Docs
 .. toctree::
    :maxdepth: 2
 
-   rst/http_api
+   rst/api
    rst/administration
    rst/js
 
