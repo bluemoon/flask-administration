@@ -1,33 +1,9 @@
-{% extends "admin/base_sidebar.html" %}
+{% extends "admin/base.metrics.html" %}
 
 {% block title %}Metrics{% endblock title %}
 
-{% block sidebar %}
-  <div class="well sidebar-nav">
-    <ul class="nav nav-list">
-      <li class="nav-header">
-      Metrics Admin
-      </li>
-      <li>
-        <a href="#">Dashboard</a>
-      </li>
-      <li>
-      <a href="{{ url_for('.new_event_key') }}" class="active">New event API key</a>
-    </li>
-  </ul>
-</div><!--/.well-->
-{% endblock sidebar %}
-
 {% block main %}
 <div class="hero-unit">
-  <form class="well">
-    <label>Label name</label>
-    <input type="text" class="span3" placeholder="Type something…">
-    <span class="help-inline">Associated help text!</span>
-    <label class="checkbox">
-      <input type="checkbox"> Check me out
-   </label>
-   <button type="submit" class="btn">Submit</button>
-  </form>
+  <h2>Dashboard</h2>
 </div>
 {% endblock main %}

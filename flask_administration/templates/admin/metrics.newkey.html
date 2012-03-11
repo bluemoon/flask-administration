@@ -1,17 +1,20 @@
-{% extends "admin/base.html" %}
+{% extends "admin/metrics.base.html" %}
 
 {% block title %}Metrics - New API Key{% endblock title %}
 
 {% block main %}
-<div class="hero-unit">
-  <form class="well">
-    <label>Label name</label>
-    <input type="text" class="span3" placeholder="Type something…">
-    <span class="help-inline">Associated help text!</span>
-    <label class="checkbox">
+  <div class="row-fluid">
+    <h2 class="well">Generating new API key for Events</h2>
+  </div>
+  <div class="row-fluid">
+    <form class="well">
+      <label>Label name</label>
+      <input type="text" class="span3" placeholder="Type something…">
+      <span class="help-inline">Associated help text!</span>
+      <label class="checkbox">
       <input type="checkbox"> Check me out
-   </label>
-   <button type="submit" class="btn">Submit</button>
-  </form>
-</div>
+     </label>
+     <button type="submit" class="btn">Submit</button>
+    </form>
+  </div>
 {% endblock main %}

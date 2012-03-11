@@ -2,8 +2,8 @@
 {{ url_for('.static', filename=some_file) }}
 {%- endmacro -%}
 
-{%- macro navigation(nav_list) -%}
-  <div id="admin-navbar" class="navbar navbar-fixed-top">
+{%- macro navigation(nav_list, brand='Flask Administration') -%}
+  <div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
       <div class="container-fluid">
         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -12,20 +12,18 @@
           <span class="icon-bar"></span>
         </a>
         <!-- Title for navbar -->
-        <a class="brand" href="#">Flask Administration</a>
+        <a class="brand" href="#">{{ brand }}</a>
         <div class="nav-collapse">
           <ul class="nav">
-            {% for nav in nav_list %}
-              <li>
-                <a href="{{ nav[1] }}">{{ nav[0] }}</a>  
-              </li>
-            {% endfor%}
+          {% for nav in nav_list %}
+            <li><a href="{{ nav[1] }}">{{ nav[0] }}</a></li>
+          {% endfor%}
           </ul>
-          <p class="navbar-text pull-right">Logged in as <a href="#">username</a></p>
-        </div><!--/.nav-collapse -->
-      </div>
-    </div>
-  </div>
+        <!--<p class="navbar-text pull-right">Logged in as <a href="#">username</a></p>-->
+        </div>
+      </div><!--/.container-fluid -->
+    </div><!--/.navbar-inner-->
+  </div><!--/.navbar .navbar-fixed-top-->
 {%- endmacro -%}
 
 <!doctype html>
@@ -46,6 +44,14 @@
 
   <!-- admin specific css -->
   <link rel="stylesheet" href="{{ static('css/bootstrap.min.css') }}">
+  <style type="text/css" media="screen">
+    body {
+      padding-top: 60px;        
+      padding-bottom: 40px;      
+    }    
+  </style>
+  <link rel="stylesheet" href="{{ static('css/bootstrap-responsive.min.css') }}">
+
   <link href="http://fonts.googleapis.com/css?family=Vollkorn&amp;subset=latin" rel="stylesheet" type="text/css">
   <link href="http://fonts.googleapis.com/css?family=Merriweather:300,regular,700,900" rel="stylesheet" type="text/css" >
   <link href="http://fonts.googleapis.com/css?family=Inconsolata:regular" rel="stylesheet" type="text/css" >
@@ -53,9 +59,9 @@
 {% endblock extra_head %}
 </head>
 
-<body lang="en">
+<body>
   {% block navbar %}
-    {{ navigation([('Metrics','/admin/metrics')]) }}
+    {{ navigation([('Metrics','/admin/metrics'), ('Logs', '/admin/logs')]) }}
   {% endblock navbar %}
 
   {% block content %}
@@ -74,7 +80,7 @@
             </div>
           {% endfor %}
         {% endif %}
-      {% block main%}{% endblock main%}
+        {% block main%}{% endblock main%}
         </div>
     </div>
   </div>

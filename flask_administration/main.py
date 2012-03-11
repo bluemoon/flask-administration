@@ -2,25 +2,18 @@ from flask_administration.utils import (_get_admin_extension_dir, encode_model)
 from flask_administration.blueprints import admin
 from flask import render_template
 
-import os
-
-template_folder = os.path.join(_get_admin_extension_dir(), 'templates')
-static_folder = os.path.join(_get_admin_extension_dir(), 'static')
-
-
 @admin.route("/")
 def index():
 	return render_template('admin/index.html')
-
 
 @admin.route("/metrics")
 def metrics():
 	""" The view for /metrics """
 	return render_template('admin/metrics.html')
 
-@admin.route("/metrics/new/key")
+@admin.route("/metrics/new-key")
 def new_event_key():
-	""" The view for /metrics/new/key """
+	""" The view for /metrics/new-key """
 	return render_template('admin/metrics.newkey.html')
 
 @admin.route("/log", defaults={'id':0})
