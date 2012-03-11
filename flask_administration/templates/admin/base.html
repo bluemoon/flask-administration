@@ -80,6 +80,7 @@
     {% endblock nav %}
   </header>
 
+{% block content %}
   <div class="container">
     <div id="main" class="content">
       {% if get_flashed_messages(with_categories=true) %}
@@ -90,12 +91,13 @@
           </div>
         {% endfor %}
       {% endif %}
-{% block main %}
-{% endblock main %}
+      {% block main %}
+      {% endblock main %}
     </div>
   </div>
   <footer>
   </footer>
+{% endblock content %}
 
 
     <!-- JavaScript at the bottom for fast page loading -->

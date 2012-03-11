@@ -12,4 +12,3 @@ metrics
    :param string endpoint: The endpoint of the blueprint for example if the url to **/e** is **example.com/events/e** then your endpoint should be **example.com/events**
 
 	
-	

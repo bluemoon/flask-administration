@@ -1,0 +1,28 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="container-fluid" id="main">
+  <div class="row-fluid">
+    <div class="span2">
+      <!-- Sidebar content -->
+      {% block sidebar %}
+      {% endblock %}
+    </div>
+    <div class="span10">
+      <!--Body content-->
+      {% if get_flashed_messages(with_categories=true) %}
+        {% for category, msg in get_flashed_messages(with_categories=true) %}
+          <div class="alert alert-block alert-{{ category }}">
+            <a class="close" data-dismiss="alert"><i class="icon-remove"></i></a>
+            {{ msg }}
+          </div>
+        {% endfor %}
+      {% endif %}
+      {% block main%}
+      {% endblock main%}
+    </div>
+  </div>
+</div>    
+<footer>
+</footer>
+{% endblock content %}
