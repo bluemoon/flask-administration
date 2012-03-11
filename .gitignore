@@ -1,2 +1,7 @@
+*.egg-info
+build/*
+dist/*
 docs/_build
 *.pyc
+MANIFEST
+test_env/
