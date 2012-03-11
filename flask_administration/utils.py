@@ -8,6 +8,7 @@ from types import ModuleType
 from itertools import groupby
 
 def encode_model(obj):
+    """ This is used for converting mongoengine models to JSON """
     if isinstance(obj, (mongoengine.Document, mongoengine.EmbeddedDocument)):
         out = dict(obj._data)
         for k,v in out.items():

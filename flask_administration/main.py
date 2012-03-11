@@ -5,7 +5,7 @@ template_folder = os.path.join(_get_admin_extension_dir(), 'templates')
 static_folder = os.path.join(_get_admin_extension_dir(), 'static')
 
 admin = Blueprint('admin', 
-                  'flask.ext.administration.index',
+                  'flask.ext.administration.main',
                    static_folder=static_folder, 
                    template_folder=template_folder)
 

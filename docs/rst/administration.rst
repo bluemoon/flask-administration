@@ -23,3 +23,15 @@ Flask-Administration Modules
     :private-members:
     :special-members:
     :inherited-members:
+
+
+:mod:`utils`
+--------------------
+
+.. automodule:: flask_administration.utils
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    :private-members:
+    :special-members:
+    :inherited-members:
