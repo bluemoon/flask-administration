@@ -1,0 +1,12 @@
+{%- macro sidebar_nav(active_page, sidebar_title, navigation_bar) -%}
+<div class="well sidebar-nav">
+  <ul class="nav nav-list">
+    <li class="nav-header">{{ sidebar_title }}</li>
+    {% for href, id, caption in navigation_bar %}
+      <li{% if id == active_page %} class="active"{% endif %}>
+		<a href="{{ href|e }}">{{ caption|e }}</a>
+	  </li>
+    {% endfor %}
+  </ul>
+</div><!--/.well-->
+{%- endmacro -%}

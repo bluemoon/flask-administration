@@ -47,7 +47,9 @@
   <style type="text/css" media="screen">
     body {
       padding-top: 60px;        
-      padding-bottom: 40px;      
+      padding-bottom: 40px;  
+      background-image:url('http://subtlepatterns.com/patterns/pinstripe.png');
+
     }    
   </style>
   <link rel="stylesheet" href="{{ static('css/bootstrap-responsive.min.css') }}">
@@ -59,7 +61,7 @@
 {% endblock extra_head %}
 </head>
 
-<body>
+<body data-spy="scroll" data-target=".subnav" data-offset="50">
   {% block navbar %}
     {{ navigation([('Metrics','/admin/metrics'), ('Logs', '/admin/logs')]) }}
   {% endblock navbar %}

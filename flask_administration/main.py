@@ -1,6 +1,6 @@
 from flask_administration.utils import (_get_admin_extension_dir, encode_model)
 from flask_administration.blueprints import admin
-from flask import render_template
+from flask import render_template, request
 
 @admin.route("/")
 def index():
@@ -11,10 +11,13 @@ def metrics():
 	""" The view for /metrics """
 	return render_template('admin/metrics.html')
 
-@admin.route("/metrics/new-key")
-def new_event_key():
-	""" The view for /metrics/new-key """
-	return render_template('admin/metrics.newkey.html')
+@admin.route("/metrics/keys")
+def event_keys():
+	""" The view for /metrics/keys """
+	if request.method == 'POST':
+		pass
+	return render_template('admin/metrics.keys.html')
+
 
 @admin.route("/log", defaults={'id':0})
 @admin.route("/log/<id>")
