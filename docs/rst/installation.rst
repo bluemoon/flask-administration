@@ -21,7 +21,7 @@ The simplest example is adding it only as a blueprint::
 A basic example with event driver would look like this::
 
     from flask import Flask
-    from flask.ext.administration import event_driver, index
+    from flask.ext.administration.blueprints import admin, events
 
     def create_app():
         app = Flask(__name__)

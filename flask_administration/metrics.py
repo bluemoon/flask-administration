@@ -1,5 +1,5 @@
 """
-.. module:: event_driver
+.. module:: metrics
    :synopsis: The event driver for the administration module
 
 .. moduleauthor:: Bradford Toney <bradford.toney@gmail.com>
@@ -7,6 +7,7 @@
 """
 from flask import jsonify, Blueprint, request, Response
 from flask_administration.utils import (static_folder, template_folder, encode_model)
+#from flask_administration.blueprints import event_blueprint
 from mongoengine import *
 
 import mongoengine
