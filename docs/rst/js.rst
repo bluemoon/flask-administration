@@ -1,12 +1,15 @@
 Javascript
 ===========
 
-.. js:function:: $.getJSON(href, callback[, errback])
 
-   :param string href: An URI to the location of the resource.
-   :param callback: Get's called with the object.
-   :param errback:
-       Get's called in case the request fails. And a lot of other
-       text so we need multiple lines
-   :throws SomeError: For whatever reason in that case.
-   :returns: Something
+metrics
+--------
+
+
+.. js:class:: events(key, endpoint)
+
+   :param string key: Key provided by the admin panel
+   :param string endpoint: The endpoint of the blueprint for example if the url to **/e** is **example.com/events/e** then your endpoint should be **example.com/events**
+
+	
+	

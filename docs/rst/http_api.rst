@@ -1,5 +1,11 @@
-HTTP API
-==========
+HTTP Log API
+=============
+
+This will describe the logging endpoints for flask
+
+
+HTTP Event API
+===============
 
 Parameters
 ------------
