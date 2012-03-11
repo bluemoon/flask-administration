@@ -13,6 +13,10 @@ Usage
 
 Basic Usage
 ------------
+The simplest example is adding it only as a blueprint::
+
+    from flask.ext.administration import index
+    app.register_blueprint(index.admin)
 
 A basic example with event driver would look like this::
 
