@@ -13,10 +13,10 @@ Flask-Administration Modules
     :special-members:
     :inherited-members:
 
-:mod:`event_driver`
+:mod:`metrics`
 --------------------
 
-.. automodule:: flask_administration.event_driver
+.. automodule:: flask_administration.metrics
     :members:
     :undoc-members:
     :show-inheritance:
@@ -35,3 +35,37 @@ Flask-Administration Modules
     :private-members:
     :special-members:
     :inherited-members:
+
+:mod:`ajax`
+--------------------
+
+.. automodule:: flask_administration.ajax
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    :private-members:
+    :special-members:
+    :inherited-members:
+
+:mod:`blueprints`
+--------------------
+
+.. automodule:: flask_administration.blueprints
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    :private-members:
+    :special-members:
+    :inherited-members:
+
+:mod:`main`
+--------------------
+
+.. automodule:: flask_administration.main
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    :private-members:
+    :special-members:
+    :inherited-members:
+

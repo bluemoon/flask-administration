@@ -24,24 +24,19 @@ def version_increment():
 #version_increment()
 
 setup(
+    author='Bradford Toney',
     name='Flask-Administration',
+    scripts=['scripts/flask_admin_manage'],
     version=__version__(),
     packages=['flask_administration'],
     include_package_data=True,
     zip_safe=False,
     platforms='any',
-    install_requires=[
-        'Flask>=0.7',
-        'wtforms>=0.6.3',
-    ],
-    classifiers=[
-        'Development Status :: 4 - Beta',
-        'Environment :: Web Environment',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: BSD License',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python',
-        'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
-        'Topic :: Software Development :: Libraries :: Python Modules'
-    ]
+    long_description=open('README.md').read(),
+    classifiers = [
+        'License :: OSI Approved :: GNU General Public License (GPL)',
+        'Development Status :: 3 - Alpha',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Programming Language :: Python'],
+
 )

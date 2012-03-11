@@ -10,6 +10,7 @@ Contents:
    
    rst/installation
    rst/examples
+   rst/usage
 
 
 

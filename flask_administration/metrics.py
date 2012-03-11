@@ -1,11 +1,11 @@
 """
-.. module:: metrics
+.. module:: metric
    :synopsis: The event driver for the administration module
 
 .. moduleauthor:: Bradford Toney <bradford.toney@gmail.com>
 
 """
-from flask import jsonify, Blueprint, request, Response
+from flask import jsonify, Blueprint, request, Response, render_template
 from flask_administration.utils import (static_folder, template_folder, encode_model)
 #from flask_administration.blueprints import event_blueprint
 from mongoengine import *
@@ -26,13 +26,12 @@ TIME = '_t'
 IDENT = '_p'
 
 event_blueprint = Blueprint('event_driver', 
-                         'flask.ext.administration.event_driver',
+                         'flask.ext.administration.metrics',
                           static_folder=static_folder, 
                           template_folder=template_folder)
 
 event_blueprint.db = mongoengine.connect(db='events')
 jug = Juggernaut()
-
 
 
 
@@ -125,8 +124,13 @@ def events():
         result = json.dumps(Event.objects.all(), default=encode_model)
         return Response(response=result)
 
-    result = json.dumps(events, default=encode_model)
+    result = json.dumps(events, default=encode_model, indent=4)
     return Response(response=result)
 
 
+
+
 mongoengine.signals.post_save.connect(Event.post_save, sender=Event)
+
+
+

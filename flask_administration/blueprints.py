@@ -1,4 +1,7 @@
-event_blueprint = Blueprint('event_driver', 
-                         'flask.ext.administration.event_driver',
-                          static_folder=static_folder, 
-                          template_folder=template_folder)
+from flask import jsonify, Blueprint, request, Response, render_template
+from flask_administration.utils import (static_folder, template_folder, encode_model)
+
+admin = Blueprint('main', 
+	             'flask.ext.administration.main',
+                  static_folder=static_folder, 
+                  template_folder=template_folder)
