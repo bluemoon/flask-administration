@@ -1,5 +1,7 @@
 from flask_administration.utils import (_get_admin_extension_dir, encode_model)
 from flask_administration.blueprints import admin
+from flask_administration.metrics import Event
+
 from flask import render_template, request
 
 @admin.route("/")
@@ -10,6 +12,11 @@ def index():
 def metrics():
 	""" The view for /metrics """
 	return render_template('admin/metrics.html')
+
+@admin.route("/metrics/events")
+def events():
+	""" The view for /metrics/events """
+	return render_template('admin/metrics.events.html', events=Event.objects.all())
 
 @admin.route("/metrics/keys")
 def event_keys():

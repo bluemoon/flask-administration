@@ -3,7 +3,7 @@ from flask.ext.administration import metrics, main
 
 def create_app():
     app = Flask(__name__)
-    app.register_blueprint(metrics.event_blueprint, url_prefix='/')
+    app.register_blueprint(metrics.event_blueprint)
     app.register_blueprint(main.admin, url_prefix='/admin')
     return app
 

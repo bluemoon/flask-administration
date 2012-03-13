@@ -1,0 +1,28 @@
+ {% set active_page = 'events' -%}
+{% extends "admin/base.metrics.html" %}
+{% block title %}Metrics - Events{% endblock title %}
+
+{% block main %}
+  <div class="row-fluid">
+    <table class="table table-striped span9">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Key</th>
+          <th>Time</th>
+          <th>Identity</th>
+        </tr>
+      </thead>
+      <tbody>
+		{% for event in events %}
+	      <tr>
+            <td>{{ event.name }}</td>
+            <td>{{ event.key }}</td>
+            <td>{{ event.time }}</td>
+            <td>{{ event.identity }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock main %}

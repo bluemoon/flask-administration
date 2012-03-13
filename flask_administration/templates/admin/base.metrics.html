@@ -1,7 +1,10 @@
 {% extends "admin/base.html" %}
 {% set navigation_bar = [
     (url_for('.metrics'), 'dashboard', 'Dashboard'),
+    (url_for('.events'), 'events', 'Events'),
     (url_for('.event_keys'), 'event-keys', 'Event Keys'),
+
+
 ] -%}
 {% set active_page = active_page|default('dashboard') -%}
 {% set sidebar_title = sidebar_title|default('Metrics') -%}

@@ -6,3 +6,6 @@ class events
 			url: @endpoint + '/e'
 			context: document.body
 		
+
+class metrics_dashboard
+	
