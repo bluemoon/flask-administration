@@ -19,3 +19,7 @@ class cluster(object):
 class bars(cluster):
 	def __init__(self, autoupdate=60):
 		pass
+
+class top_list(cluster):
+	def __init__(self):
+		pass
