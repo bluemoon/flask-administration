@@ -3,3 +3,4 @@ mongoengine
 simplejson
 redisco
 redis
+juggernaut
