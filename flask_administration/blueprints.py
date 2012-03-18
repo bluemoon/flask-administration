@@ -1,5 +1,5 @@
 from flask import jsonify, Blueprint, request, Response, render_template
-from flask_administration.utils import (static_folder, template_folder, encode_model)
+from .utils import (static_folder, template_folder, encode_model)
 
 admin = Blueprint('main', 
 	             'flask.ext.administration.main',
