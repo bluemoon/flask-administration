@@ -2,3 +2,4 @@ flask>=0.8
 mongoengine
 simplejson
 redisco
+redis
