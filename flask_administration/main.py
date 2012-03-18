@@ -25,7 +25,6 @@ def event_keys():
 		pass
 	return render_template('admin/metrics.keys.html')
 
-
 @admin.route("/log", defaults={'id':0})
 @admin.route("/log/<id>")
 def log(id):
