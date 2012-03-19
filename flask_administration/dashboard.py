@@ -6,12 +6,15 @@ class dashboard(object):
 		self.clusters = kwargs.get('clusters', [])
 
 	def __iadd__(self, other):
-		""" This should support adding in a manner like this:
-		>>> b = bars()
-		>>> d = dashboard()
-		>>> d += b
+		""" This should support adding in a manner like this::
+
+		   >>> b = bars()
+		   >>> d = dashboard()
+		   >>> d += b
 		"""
-		pass
+		if isinstance(other, cluster):
+			self.clusters.append(other)
+		return self
 
 
 class gauge_mixin(object):
@@ -27,8 +30,11 @@ class gauge(gauge_mixin):
 class cluster(object):
 	def __init__(self, gauges, **kwargs):
 		""" cluster initialization
+
 		:param gauges: A list of gauges or a single element
+
 		:param **kwargs: keyworded arguments
+
 		"""
 		pass
 
@@ -40,8 +46,11 @@ class cluster(object):
 class bars(cluster):
 	def __init__(self, gauges, **kwargs):
 		""" Bar graph cluster
+
 		:param gauges: A list of gauges or a single element
+
 		:param **kwargs: keyworded arguments
+
 		"""
 		self.gauges = gauges
 		#: Autoupdate defaults to 1000ms and this value should be in ms
@@ -60,3 +69,8 @@ class top_list(cluster):
 
 def dashboard_test():
 	""" Build from classes """
+	dash = dashboard()
+	dash += bars()
+
+if __name__ == '__main__':
+	dashboard_test()
