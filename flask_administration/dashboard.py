@@ -13,7 +13,12 @@ class gauge(gauge_mixin):
 
 
 class cluster(object):
+	""" A set of gauges in a cluster """
 	def __init__(self):
+		pass
+
+	@property
+	def data(self):
 		pass
 
 class bars(cluster):
