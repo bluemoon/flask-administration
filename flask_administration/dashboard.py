@@ -1,4 +1,47 @@
-class dashboard(object):
+class size_mixin(object):
+    def __init__(self, **kwargs):
+        """ Size mixin with all the relevant functions """
+        self.columns = kwargs.get('columns', 10)
+        self.rows = kwargs.get('rows', 10)
+        self.width = 0
+        self.height = 0
+
+    def get_size(self):
+        """ return a tuple of the width and height """
+        return self.width, self.height
+
+    def set_size(self, size):
+        """ set the size with a tuple of width and height in that order """
+        self.width, self.height = size
+
+    #: Returns the current size in a tuple, or sets the size
+    size = property(get_size, set_size)
+    
+    @property
+    def cell_width_px(self):
+        """ return the width of a single cell in pixels """
+        pass
+
+    @property
+    def cell_height_px(self):
+        """ return the height of a single cell in pixels """
+        pass
+
+    @property
+    def cell_width_percent(self):
+        pass
+    
+    @property
+    def cell_height_percent(self):
+        pass
+
+    @property
+    def cell_px(self):
+        return self.cell_width_px, self.cell_height_px
+
+
+
+class dashboard(size_mixin):
     """ Base class for the dashboard. We can start off by creating an instance 
     of the dashboard and then adding items to the dashboard like in the example 
     below.
@@ -15,9 +58,9 @@ class dashboard(object):
         """ :arguments: clusters
 
         """
+
         self.clusters = kwargs.get('clusters', [])
-        self.columns = kwargs.get('columns', 10)
-        self.rows = kwargs.get('rows', 10)
+        
         self.title = kwargs.get('title', 'Dashboard')
 
     def __iadd__(self, other):
@@ -26,16 +69,6 @@ class dashboard(object):
             self.clusters.append(other)
         return self
 
-    def get_size(self):
-        """ return a tuple of the width and height """
-        return self.width, self.height
-
-    def set_size(self, size):
-        """ set the size with a tuple of width and height in that order """
-        self.width, self.height = size
-
-    #: Returns the current size in a tuple, or sets the size
-    size = property(get_size, set_size)
 
     @property
     def id(self):
