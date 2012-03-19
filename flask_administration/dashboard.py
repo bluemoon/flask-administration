@@ -29,14 +29,18 @@ class size_mixin(object):
 
     @property
     def cell_width_percent(self):
+        """ return the width of a single cell in pixels """
         pass
     
     @property
     def cell_height_percent(self):
+        """ return the height of a single cell in pixels """
         pass
 
     @property
     def cell_px(self):
+        """ return the size of a single cell as a tuple using the previous 
+        decorators """
         return self.cell_width_px, self.cell_height_px
 
 
