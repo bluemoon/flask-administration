@@ -27,9 +27,11 @@ class dashboard(object):
         return self
 
     def get_size(self):
+        """ return a tuple of the width and height """
         return self.width, self.height
 
     def set_size(self, size):
+        """ set the size with a tuple of width and height in that order """
         self.width, self.height = size
 
     #: Returns the current size in a tuple, or sets the size
