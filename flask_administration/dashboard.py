@@ -14,12 +14,10 @@ class dashboard(object):
 		pass
 
 
-
-
-
 class gauge_mixin(object):
 	""" Base mixin for gauge """
 	pass
+
 
 class gauge(gauge_mixin):
 	""" Base class for the gauge """
@@ -27,8 +25,11 @@ class gauge(gauge_mixin):
 
 
 class cluster(object):
-	""" A set of gauges in a cluster """
-	def __init__(self):
+	""" cluster
+		:param gauges: A list of gauges or a single element
+		:param **kwargs: keyworded arguments
+		"""
+	def __init__(self, gauges, **kwargs):
 		pass
 
 	@property
@@ -56,4 +57,4 @@ class top_list(cluster):
 
 
 def dashboard_test():
-	""" Build from a test string """
+	""" Build from classes """
