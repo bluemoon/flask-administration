@@ -32,6 +32,7 @@ class dashboard(object):
     def set_size(self, size):
         self.width, self.height = size
 
+    #: Returns the current size in a tuple, or sets the size
     size = property(get_size, set_size)
 
     @property

@@ -47,16 +47,6 @@ Flask-Administration Modules
     :special-members:
     :inherited-members:
 
-:mod:`blueprints`
---------------------
-
-.. automodule:: flask_administration.blueprints
-    :members:
-    :undoc-members:
-    :show-inheritance:
-    :private-members:
-    :special-members:
-    :inherited-members:
 
 :mod:`main`
 --------------------

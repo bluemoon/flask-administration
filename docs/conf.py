@@ -177,6 +177,9 @@ html_static_path = ['_static']
 htmlhelp_basename = 'Flask-Administrationdoc'
 
 
+
+autoclass_content = 'both'
+
 # -- Options for LaTeX output --------------------------------------------------
 
 latex_elements = {
