@@ -1,7 +1,10 @@
 
 class dashboard(object):
 	""" Base class for the dashboard """
-	pass
+	
+	def __init__(self, **kwargs):
+		self.clusters = kwargs.get('clusters', [])
+		
 
 class gauge_mixin(object):
 	""" Base mixin for gauge """
