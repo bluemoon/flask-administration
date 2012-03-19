@@ -1,17 +1,18 @@
 class size_mixin(object):
-    def __init__(self, **kwargs):
-        """ Size mixin with all the relevant functions 
+    """ Size mixin with all the relevant functions 
 
-        **Extend the class**
+    **Extend the class**
         
-        >>> class test(size_mixin):
-        >>>     pass
+    >>> class test(size_mixin):
+    >>>     pass
 
-        **Create an instance**
+    **Create an instance**
 
-        >>> t = test()
-        >>> 
-        """
+    >>> t = test(columns=15, rows=10)
+    >>> t.size = (100, 100)
+    
+    """
+    def __init__(self, **kwargs):
         self.columns = kwargs.get('columns', 10)
         self.rows = kwargs.get('rows', 10)
         self.width = 0
@@ -97,7 +98,7 @@ class gauge_mixin(object):
 class gauge(gauge_mixin):
     """ Base class for the gauge """
     def __init__(self, **kwargs):
-        self.mongo = kwargs.get('mongo_cls')
+        self.even = kwargs.get('event')
 
 
 class cluster(object):
