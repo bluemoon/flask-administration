@@ -1,10 +1,14 @@
-
 class dashboard(object):
-    """ Base class for the dashboard. We can start off by creating an instance of the dashboard 
-    and then adding items to the dashboard like in the example below.
+    """ Base class for the dashboard. We can start off by creating an instance 
+    of the dashboard and then adding items to the dashboard like in the example 
+    below.
+
+    ** Class based usage **
 
     >>> dash = dashboard()
     >>> d += bars()
+    
+
     """
     
     def __init__(self, **kwargs):
