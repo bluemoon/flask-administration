@@ -25,16 +25,17 @@ class gauge(gauge_mixin):
 
 
 class cluster(object):
-	""" cluster
+	def __init__(self, gauges, **kwargs):
+		""" cluster initialization
 		:param gauges: A list of gauges or a single element
 		:param **kwargs: keyworded arguments
 		"""
-	def __init__(self, gauges, **kwargs):
 		pass
 
 	@property
 	def data(self):
 		pass
+
 
 class bars(cluster):
 	def __init__(self, gauges, **kwargs):
@@ -45,6 +46,7 @@ class bars(cluster):
 		self.gauges = gauges
 		#: Autoupdate defaults to 1000ms and this value should be in ms
 		self.autoupdate = kwargs.get('autoupdate', 1000)
+
 
 class top_list(cluster):
 	def __init__(self):
