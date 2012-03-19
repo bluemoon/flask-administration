@@ -6,7 +6,7 @@ Contents:
 -----------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    
    rst/installation
    rst/examples
@@ -18,7 +18,7 @@ API/Reference Docs
 --------------------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    rst/api
    rst/administration

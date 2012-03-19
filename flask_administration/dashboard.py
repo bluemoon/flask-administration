@@ -1,11 +1,10 @@
 
 class dashboard(object):
-    """ Base class for the dashboard. 
-    This should support adding in a manner like this
+    """ Base class for the dashboard. We can start off by creating an instance of the dashboard 
+    and then adding items to the dashboard like in the example below.
 
-    >>> b = bars()
-    >>> d = dashboard()
-    >>> d += b
+    >>> dash = dashboard()
+    >>> d += bars()
     """
     
     def __init__(self, **kwargs):
