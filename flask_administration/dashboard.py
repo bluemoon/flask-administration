@@ -1,15 +1,22 @@
-class size_mixin(object):
+from math import floor, ceil
+from metrics import Event
+from pandas import *
+
+class Menu(object):
+    pass
+
+class SizeMixin(object):
     """ Size mixin with all the relevant functions 
 
     **Extend the class**
         
-    >>> class test(size_mixin):
+    >>> class test(SizeMixin):
     >>>     pass
 
     **Create an instance**
 
     >>> t = test(columns=15, rows=10)
-    >>> t.size = (100, 100)
+    >>> t.size = (100, 100)ß
 
     """
     def __init__(self, **kwargs):
@@ -57,26 +64,21 @@ class size_mixin(object):
 
 
 
-class dashboard(size_mixin):
+class Dashboard(SizeMixin):
     """ Base class for the dashboard. We can start off by creating an instance 
     of the dashboard and then adding items to the dashboard like in the example 
     below.
 
     **Class based usage**
 
-    >>> dash = dashboard()
-    >>> dash += bars()
+    >>> dash = Dashboard()
+    >>> dash += Bars()
     
 
     """
     
     def __init__(self, **kwargs):
-        """ :arguments: clusters
-
-        """
-
         self.clusters = kwargs.get('clusters', [])
-        
         self.title = kwargs.get('title', 'Dashboard')
 
     def __iadd__(self, other):
@@ -90,18 +92,34 @@ class dashboard(size_mixin):
     def id(self):
         return '%s-dashboard' % self.title
 
-class gauge_mixin(object):
+
+class GaugeMixin(object):
     """ Base mixin for gauge """
     pass
 
 
-class gauge(gauge_mixin):
+class Gauge(GaugeMixin):
     """ Base class for the gauge """
     def __init__(self, **kwargs):
-        self.even = kwargs.get('event')
+        self.event_name = kwargs.get('event_name')
+        self.tick = float(kwargs.get('tick', 3600))
+        self.has_tick = kwargs.get('has_tick', False)
+        self.aggregate = kwargs.get('aggregate', False)
+
+    def tick_at(self, tick):
+        if self.aggregate:
+            return floor(tick / self.tick) * tick
+        else:
+            return len(Event.objects(name=self.event_name))
+
+    def value_at(self, tick):
+        return Event.objects(name=self.event)
+
+    def values_in(self, begin, end):
+        return ceil((end - begin)/self.tick)+1
 
 
-class cluster(object):
+class Cluster(object):
     def __init__(self, **kwargs):
         """ cluster initialization
 
@@ -120,7 +138,7 @@ class cluster(object):
         pass
 
 
-class bars(cluster):
+class Bars(cluster):
     pass
 
         
@@ -137,8 +155,8 @@ class top_list(cluster):
 
 def dashboard_test():
     """ Build from classes """
-    dash = dashboard()
-    dash += bars()
+    dash = Dashboard()
+    dash += Bars()
 
 if __name__ == "__main__":
     import doctest
