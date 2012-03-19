@@ -22,8 +22,13 @@ class cluster(object):
 		pass
 
 class bars(cluster):
-	def __init__(self, autoupdate=60):
-		pass
+	def __init__(self, gauges, **kwargs):
+		""" Bar graph cluster
+		:param gauges: A list of gauges or a single element
+		:param **kwargs: keyworded arguments
+		"""
+		self.gauges = gauges
+		self.autoupdate = kwargs.get('autoupdate', 1000)
 
 class top_list(cluster):
 	def __init__(self):
