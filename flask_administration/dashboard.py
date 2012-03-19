@@ -23,3 +23,7 @@ class bars(cluster):
 class top_list(cluster):
 	def __init__(self):
 		pass
+
+	@property
+	def data(self):
+		pass
