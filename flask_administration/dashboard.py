@@ -4,7 +4,7 @@ class dashboard(object):
 	
 	def __init__(self, **kwargs):
 		self.clusters = kwargs.get('clusters', [])
-		
+
 
 class gauge_mixin(object):
 	""" Base mixin for gauge """
@@ -31,6 +31,7 @@ class bars(cluster):
 		:param **kwargs: keyworded arguments
 		"""
 		self.gauges = gauges
+		#: Autoupdate defaults to 1000ms and this value should be in ms
 		self.autoupdate = kwargs.get('autoupdate', 1000)
 
 class top_list(cluster):
