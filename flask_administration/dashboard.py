@@ -10,7 +10,7 @@ class size_mixin(object):
 
     >>> t = test(columns=15, rows=10)
     >>> t.size = (100, 100)
-    
+
     """
     def __init__(self, **kwargs):
         self.columns = kwargs.get('columns', 10)
@@ -116,23 +116,13 @@ class cluster(object):
 
     @property
     def data(self):
-        """ Some documentation text.
-
-
-        >>> print 1
-        1
-
-        Some more documentation text. """
+        """ """
         pass
 
 
 class bars(cluster):
-    def __init__(self, **kwargs):
-        """ Bar graph cluster
+    pass
 
-        :param **kwargs: keyworded arguments
-        """
-        pass
         
 
 class top_list(cluster):
