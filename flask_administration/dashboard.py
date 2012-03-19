@@ -1,17 +1,17 @@
 
 class dashboard(object):
-    """ Base class for the dashboard """
+    """ Base class for the dashboard. 
+    This should support adding in a manner like this
+
+    >>> b = bars()
+    >>> d = dashboard()
+    >>> d += b
+    """
     
     def __init__(self, **kwargs):
         self.clusters = kwargs.get('clusters', [])
 
     def __iadd__(self, other):
-        """ This should support adding in a manner like this::
-
-           >>> b = bars()
-           >>> d = dashboard()
-           >>> d += b
-        """
         if isinstance(other, cluster):
             self.clusters.append(other)
         return self
