@@ -5,6 +5,17 @@ class dashboard(object):
 	def __init__(self, **kwargs):
 		self.clusters = kwargs.get('clusters', [])
 
+	def __iadd__(self, other):
+		""" This should support adding in a manner like this:
+		>>> b = bars()
+		>>> d = dashboard()
+		>>> d += b
+		"""
+		pass
+
+
+
+
 
 class gauge_mixin(object):
 	""" Base mixin for gauge """
@@ -41,3 +52,8 @@ class top_list(cluster):
 	@property
 	def data(self):
 		pass
+
+
+
+def dashboard_test():
+	""" Build from a test string """
