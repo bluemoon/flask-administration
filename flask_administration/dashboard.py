@@ -24,7 +24,8 @@ class gauge_mixin(object):
 
 class gauge(gauge_mixin):
 	""" Base class for the gauge """
-	pass
+	def __init__(self, **kwargs):
+		self.mongo = kwargs.get('mongo_cls')
 
 
 class cluster(object):
@@ -32,7 +33,6 @@ class cluster(object):
 		""" cluster initialization
 
 		:param gauges: A list of gauges or a single element
-
 		:param **kwargs: keyworded arguments
 
 		"""
