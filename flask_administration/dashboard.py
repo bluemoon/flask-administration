@@ -3,7 +3,7 @@ class dashboard(object):
     of the dashboard and then adding items to the dashboard like in the example 
     below.
 
-    ** Class based usage **
+    **Class based usage**
 
     >>> dash = dashboard()
     >>> dash += bars()
