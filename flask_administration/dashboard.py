@@ -99,21 +99,32 @@ class GaugeMixin(object):
 
 
 class Gauge(GaugeMixin):
-    """ Base class for the gauge """
+    """ Gauge class, __init__ takes several keyworded arguments, only a few
+    are required. The main one that is required is event_name. 
+
+    :arguments: event_name
+
+     """
     def __init__(self, **kwargs):
         self.event_name = kwargs.get('event_name')
         self.tick = float(kwargs.get('tick', 3600))
         self.has_tick = kwargs.get('has_tick', False)
         self.aggregate = kwargs.get('aggregate', False)
 
+    def tick(self):
+        if self.aggregate:
+            return None
+        else:
+            return len(Event.objects(name=self.event_name))
+
     def tick_at(self, tick):
         if self.aggregate:
             return floor(tick / self.tick) * tick
         else:
-            return len(Event.objects(name=self.event_name))
+            return None
 
     def value_at(self, tick):
-        return Event.objects(name=self.event)
+        return Event.objects(name=self.event)[tick]
 
     def values_in(self, begin, end):
         return ceil((end - begin)/self.tick)+1
@@ -138,12 +149,12 @@ class Cluster(object):
         pass
 
 
-class Bars(cluster):
+class Bars(Cluster):
     pass
 
         
 
-class top_list(cluster):
+class top_list(Cluster):
     def __init__(self):
         pass
 
