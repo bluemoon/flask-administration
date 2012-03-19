@@ -40,6 +40,14 @@ class cluster(object):
 
 	@property
 	def data(self):
+		""" Some documentation text.
+
+		.. doctest::
+
+		    >>> print 1
+			1
+
+		Some more documentation text. """
 		pass
 
 
