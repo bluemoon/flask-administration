@@ -1,6 +1,5 @@
 from math import floor, ceil
 from metrics import Event
-from pandas import *
 
 class Menu(object):
     pass
@@ -16,7 +15,7 @@ class SizeMixin(object):
     **Create an instance**
 
     >>> t = test(columns=15, rows=10)
-    >>> t.size = (100, 100)ß
+    >>> t.size = (100, 100)
 
     """
     def __init__(self, **kwargs):
@@ -101,9 +100,6 @@ class GaugeMixin(object):
 class Gauge(GaugeMixin):
     """ Gauge class, __init__ takes several keyworded arguments, only a few
     are required. The main one that is required is event_name. 
-
-    :arguments: event_name
-
      """
     def __init__(self, **kwargs):
         self.event_name = kwargs.get('event_name')
@@ -115,7 +111,8 @@ class Gauge(GaugeMixin):
         if self.aggregate:
             return None
         else:
-            return len(Event.objects(name=self.event_name))
+            #return len(Event.objects(name=self.event_name))
+            pass
 
     def tick_at(self, tick):
         if self.aggregate:
@@ -161,14 +158,3 @@ class top_list(Cluster):
     @property
     def data(self):
         pass
-
-
-
-def dashboard_test():
-    """ Build from classes """
-    dash = Dashboard()
-    dash += Bars()
-
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
