@@ -1,6 +1,17 @@
 class size_mixin(object):
     def __init__(self, **kwargs):
-        """ Size mixin with all the relevant functions """
+        """ Size mixin with all the relevant functions 
+
+        **Extend the class**
+        
+        >>> class test(size_mixin):
+        >>>     pass
+
+        **Create an instance**
+
+        >>> t = test()
+        >>> 
+        """
         self.columns = kwargs.get('columns', 10)
         self.rows = kwargs.get('rows', 10)
         self.width = 0
