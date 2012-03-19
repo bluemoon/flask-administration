@@ -8,9 +8,13 @@ class dashboard(object):
     """
     
     def __init__(self, **kwargs):
+        """ :arguments: clusters
+
+        """
         self.clusters = kwargs.get('clusters', [])
 
     def __iadd__(self, other):
+        """ """
         if isinstance(other, cluster):
             self.clusters.append(other)
         return self
