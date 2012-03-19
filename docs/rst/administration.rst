@@ -79,5 +79,6 @@ Flask-Administration Modules
     :undoc-members:
     :show-inheritance:
     :private-members:
+    :special-members:
     :inherited-members:
 
