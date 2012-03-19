@@ -6,7 +6,7 @@ class dashboard(object):
     ** Class based usage **
 
     >>> dash = dashboard()
-    >>> d += bars()
+    >>> dash += bars()
     
 
     """
@@ -16,6 +16,9 @@ class dashboard(object):
 
         """
         self.clusters = kwargs.get('clusters', [])
+        self.columns = kwargs.get('columns', 10)
+        self.rows = kwargs.get('rows', 10)
+        self.title = kwargs.get('title', 'Dashboard')
 
     def __iadd__(self, other):
         """ """
@@ -23,6 +26,17 @@ class dashboard(object):
             self.clusters.append(other)
         return self
 
+    def get_size(self):
+        return self.width, self.height
+
+    def set_size(self, size):
+        self.width, self.height = size
+
+    size = property(get_size, set_size)
+
+    @property
+    def id(self):
+        return '%s-dashboard' % self.title
 
 class gauge_mixin(object):
     """ Base mixin for gauge """
