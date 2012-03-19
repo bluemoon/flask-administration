@@ -76,8 +76,8 @@ Flask-Administration Modules
 
 .. automodule:: flask_administration.dashboard
     :members:
-    :undoc-members:
     :show-inheritance:
     :private-members:
+    :special-members:
     :inherited-members:
 
