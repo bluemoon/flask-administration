@@ -102,3 +102,9 @@ List between two times::
 	
 	/events?before=1231292609.140918&after=1331292609.140918
 
+Listing with a specific event name::
+
+	/events?name=YourEventName
+	
+
+

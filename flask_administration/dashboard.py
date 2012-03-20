@@ -77,6 +77,7 @@ class Dashboard(SizeMixin):
     """
     
     def __init__(self, **kwargs):
+        SizeMixin.__init__(**kwargs)
         self.clusters = kwargs.get('clusters', [])
         self.title = kwargs.get('title', 'Dashboard')
 

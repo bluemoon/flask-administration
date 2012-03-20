@@ -45,7 +45,7 @@ class Event(mongoengine.Document):
     @classmethod
     def post_save(cls, sender, document, *args, **kwargs):
         result = json.dumps(document, default=encode_model)
-        jug.publish('event', result)
+        jug.publish('event-{}'.format(), result)
 
 
 
@@ -105,7 +105,7 @@ def events():
     Displays all of the events
 
     """
-
+    name = request.args.get('name', None)
     before = request.args.get('before', False)
     after = request.args.get('after', False)
 
