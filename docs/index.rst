@@ -24,6 +24,7 @@ API/Reference Docs
    rst/administration
    rst/js
    rst/dashboard
+   rst/journal
 
 
 Indices and tables
