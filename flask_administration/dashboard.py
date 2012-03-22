@@ -1,3 +1,13 @@
+""" 
+There's two types of information at play here: 
+
+* Metric sources and gauge backend data
+* Dashboard layout
+
+The dashboard needs to be built with this in consideration.
+
+"""
+
 from math import floor, ceil
 from metrics import Event
 
@@ -72,7 +82,7 @@ class Dashboard(SizeMixin):
 
     >>> dash = Dashboard()
     >>> dash += Bars()
-    
+    >>> dash.size
 
     """
     

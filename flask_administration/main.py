@@ -1,8 +1,8 @@
-from flask_administration.utils import (_get_admin_extension_dir, encode_model)
+from flask_administration.utils import (_get_admin_extension_dir, encode_model, make_json_response)
 from flask_administration.blueprints import admin
 from flask_administration.metrics import Event
 
-from flask import render_template, request
+from flask import render_template, request, jsonify
 
 @admin.route("/")
 def index():
@@ -29,3 +29,14 @@ def event_keys():
 @admin.route("/log/<id>")
 def log(id):
 	return render_template('admin/log.html', id=id)
+
+## Dashboard routes
+@admin.route("/dashboard/load/", defaults={'dashboard':'default'})
+@admin.route("/dashboard/load/<dashboard>")
+def load_dashboard(dashboard):
+	return make_json_response([{'id':2, 'gauge': {'type':'TimelineView'}}])
+
+@admin.route("/dashboard/gauge/", defaults={'gauge_id':'1'})
+@admin.route("/dashboard/gauge/<gauge_id>")
+def load_gauge(gauge_id):
+	return make_json_response([{'id':1, 'data':1}, {'id':2, 'data': ['el1', 'el2']}])
