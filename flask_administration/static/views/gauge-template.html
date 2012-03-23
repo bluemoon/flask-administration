@@ -1,0 +1,10 @@
+<script type="text/template" id="gauge-template">    
+  <div class="span2 well" id="gauge-<%= id %>">
+    <a class="close">&times;</a>
+    <ul class="nav nav-tabs nav-stacked">
+	<% _.each(data, function(d) {  %>
+	  <li><%= d %></li>
+	<% }); %> 
+    </ul>
+  </div>
+</script>
