@@ -4,10 +4,12 @@ BASE_URL = 'http://127.0.0.1:5000/admin'
 models = {}
 collections = {}
 views = {}
+
 dashboard = {}
 
 ##: Models
 class models.Gauge extends Backbone.Model
+
 class models.Dashboard extends Backbone.Model
 
 ##: Collections
@@ -30,7 +32,6 @@ class views.GaugeView extends Backbone.View
   initialize: (options) ->
     console.log options
     @id = options.id
-    #@el = $('gauge-' + @id)
     @el = options.el
     console.log @el
     @

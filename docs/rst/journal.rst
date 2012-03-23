@@ -10,7 +10,10 @@ Things that a dashboard would have.
 
 * Twitter/Sentinment analysis.
 * Timeline(facebook style)
-* 
+* Server Status
+* Metrics, lots of metrics, cohort, funnel etc.
+* Integration with external services (stripe, github)
+
 
 
 
