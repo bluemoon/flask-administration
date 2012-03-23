@@ -1,4 +1,8 @@
 $ = jQuery
+
+_.mixin _.string.exports()
+
+
 BASE_URL = 'http://127.0.0.1:5000/admin'
 
 models = {}
@@ -6,6 +10,29 @@ collections = {}
 views = {}
 
 dashboard = {}
+
+TemplateManager = 
+  templates: {}
+  get: (name, callback) ->
+    template = @templates[name]
+    if template
+      callback(template)
+    else
+      @fetch(name + '.html', callback)
+    if _(@name).endsWith 'html'
+      @fetch(name, callback)
+
+
+  fetch: (name, callback) ->
+    $.ajax '/admin/static/views/' + name,
+      type: 'GET'
+      dataType: 'html'
+      error: (jqXHR, textStatus, errorThrown) ->
+        ($ 'body').append 'AJAX Error: #{textStatus}'
+      success: (data, textStatus, jqXHR) =>
+        @template = _.template ($ data).html()
+        callback(@template)
+
 
 ##: Models
 class models.Gauge extends Backbone.Model
@@ -26,38 +53,28 @@ class collections.Dashboards extends Backbone.Collection
 ##: Views
 #dashboard.GaugeView = Backbone.View
 class views.GaugeView extends Backbone.View
+  tagName: "div"
   template: _.template($('#gauge-template').html())
-  parent: $ '#main'
-  
+
   initialize: (options) ->
-    console.log options
-    @id = options.id
-    @el = options.el
-    console.log @el
-    @
+    @id = options.nid
+    @parent = options.parent
+    this
 
   render: ->
-    app.collections.gauges.fetch success: () =>
-      data = app.collections.gauges.get(@id).attributes.data
-      @parent.append(@template({'id': @id, 'data': data}))
-    @
+    TemplateManager.get 'gauge-template', (Template) =>
+      @parent.collections.gauges.fetch success: () =>
+        data = @parent.collections.gauges.get(@id).attributes.data
+        @$el.html ($ Template
+          'id': @id
+          'data': data)
+    this
 
-  hide: ->
-    @el.remove()
 
-  close: (e) ->
-    console.log 'Closing'
-    closing = $ '#gauge-' + @id
-    console.log closing
-    closing.remove()
-    false
-
-  events: 'click .close' : 'hide'
-
-class dashboard.TimelineView extends views.GaugeView
+class views.TimelineView extends views.GaugeView
   template: _.template($('#gauge-timeline-template').html())
 
-class dashboard.TimeView extends views.GaugeView
+class views.TimeView extends views.GaugeView
   updateTime: ->
     now      = new Date
     hours    = now.getHours()
@@ -73,34 +90,47 @@ class dashboard.TimeView extends views.GaugeView
 
 class views.DashboardView extends Backbone.View
   views: []
+  collections:
+    dashboards: new collections.Dashboards
+      url: '/admin/dashboard/load'
 
-  render: =>
+    gauges: new collections.Gauges
+      url: '/admin/dashboard/gauge/'
+
+  initialize: (options) ->
+    @el = $ options.el
+    console.log @collections
+    this
+  
+  render: ->
+    ($ '#js-loading').remove()
     @views = []
     @el.empty()
-    app.collections.dashboards.map (i) =>
-      gauge = i.get('gauge')
-      klass = dashboard[gauge.type]
-      k_instance = new klass
-        id: i.get('id')
-        el: $('gauge-' + i.get('id'))
-      @views.push k_instance
-      #app.views.other.push k_instance
+    @collections.dashboards.map (item) =>
+      gauge = item.get('gauge')
+      gauge_id = item.get('id')
+      klass = views[gauge.type]
 
-    result = (item.render() for item in @views)
-    @
+      ele = '#gauge-' + gauge_id
+      k_instance = new klass
+        parent: this
+        nid: gauge_id
+        id: ele
+      console.log k_instance.el
+      @el.append k_instance.render().el
+      @views.push k_instance
+
+    #result = (item.render().el for item in @views)
+    #console.log result
+    this
     
 
-class dashboard.ApplicationRouter extends Backbone.Router
-  routes:
-    "*actions": "home"
-
-  home: ->
-    documents = new collections.Dashboards
-      url: '/admin/dashboard/load/'
-    documents.fetch
-      success: () ->
-        new views.DashboardView({ collection: documents })
+  preRender: ->
+    @collections.dashboards.fetch success: () =>
+      @render()
 
 $ ->
-  new dashboard.ApplicationRouter
-  Backbone.history.start()
+  appView = new views.DashboardView
+    el: $ '#main'
+  appView.preRender()
+
