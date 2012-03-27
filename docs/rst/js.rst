@@ -1,6 +1,9 @@
 Javascript
 ===========
 
+dashboard
+----------
+The dashboard is built on top of backbone.js
 
 metrics
 --------

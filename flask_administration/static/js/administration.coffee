@@ -8,12 +8,13 @@ BASE_URL = 'http://127.0.0.1:5000/admin'
 models = {}
 collections = {}
 views = {}
-
+dispatch = _.extend({}, Backbone.Events)
 dashboard = {}
 
 TemplateManager = 
   templates: {}
   get: (name, callback) ->
+    name.replace "#", ""
     template = @templates[name]
     if template
       callback(template)
@@ -57,38 +58,52 @@ class views.GaugeView extends Backbone.View
   template: _.template($('#gauge-template').html())
 
   initialize: (options) ->
-    @id = options.nid
+    @nid = options.nid
     @parent = options.parent
+    dispatch.on("tick:rtc", @update)
     this
+
+  update: ->
+
 
   render: ->
     TemplateManager.get 'gauge-template', (Template) =>
       @parent.collections.gauges.fetch success: () =>
-        data = @parent.collections.gauges.get(@id).attributes.data
+        data = @parent.collections.gauges.get(@nid).attributes.data
         @$el.html ($ Template
-          'id': @id
+          'id': @nid
           'data': data)
     this
 
 
 class views.TimelineView extends views.GaugeView
   template: _.template($('#gauge-timeline-template').html())
+  initialize: (options) ->
+    @nid = options.nid
+    @parent = options.parent
+    @timeElement = $("#time-" + @nid)
+    console.log @nid
+    dispatch.on("tick:rtc", @update)
+    this
 
-class views.TimeView extends views.GaugeView
-  updateTime: ->
+  update: =>
     now      = new Date
     hours    = now.getHours()
     minutes  = now.getMinutes()
     seconds  = now.getSeconds()
     meridian = if hours < 12 then "AM" else "PM"
-
     hours   -= 12 if hours > 12
     hours    = 12 if hours == 0
     minutes  = "0#{minutes}" if minutes < 10
     seconds  = "0#{seconds}" if seconds < 10
-    this.$("#time span").text("#{hours}:#{minutes}:#{seconds} #{meridian}")
+    console.log @timeElement
+    $("#time-" + @nid).text("#{hours}:#{minutes}:#{seconds} #{meridian}")
+
+class views.TimeView extends views.GaugeView
+  
 
 class views.DashboardView extends Backbone.View
+  ticks: 0
   views: []
   collections:
     dashboards: new collections.Dashboards
@@ -99,7 +114,7 @@ class views.DashboardView extends Backbone.View
 
   initialize: (options) ->
     @el = $ options.el
-    console.log @collections
+    @incrementTick()
     this
   
   render: ->
@@ -110,13 +125,11 @@ class views.DashboardView extends Backbone.View
       gauge = item.get('gauge')
       gauge_id = item.get('id')
       klass = views[gauge.type]
-
       ele = '#gauge-' + gauge_id
       k_instance = new klass
         parent: this
         nid: gauge_id
         id: ele
-      console.log k_instance.el
       @el.append k_instance.render().el
       @views.push k_instance
 
@@ -124,6 +137,14 @@ class views.DashboardView extends Backbone.View
     #console.log result
     this
     
+  incrementTick: =>        
+    dispatch.trigger('tick:increment')
+    @_intervalFetch = window.setTimeout @incrementTick, 100
+    if @ticks % 10 == 0
+      dispatch.trigger('tick:rtc')
+    @ticks++
+    @
+
 
   preRender: ->
     @collections.dashboards.fetch success: () =>

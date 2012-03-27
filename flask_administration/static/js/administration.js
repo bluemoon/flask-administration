@@ -1,7 +1,8 @@
 (function() {
-  var $, BASE_URL, TemplateManager, collections, dashboard, models, views,
+  var $, BASE_URL, TemplateManager, collections, dashboard, dispatch, models, views,
     __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; },
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   $ = jQuery;
 
@@ -15,12 +16,15 @@
 
   views = {};
 
+  dispatch = _.extend({}, Backbone.Events);
+
   dashboard = {};
 
   TemplateManager = {
     templates: {},
     get: function(name, callback) {
       var template;
+      name.replace("#", "");
       template = this.templates[name];
       if (template) {
         callback(template);
@@ -118,10 +122,13 @@
     GaugeView.prototype.template = _.template($('#gauge-template').html());
 
     GaugeView.prototype.initialize = function(options) {
-      this.id = options.nid;
+      this.nid = options.nid;
       this.parent = options.parent;
+      dispatch.on("tick:rtc", this.update);
       return this;
     };
+
+    GaugeView.prototype.update = function() {};
 
     GaugeView.prototype.render = function() {
       var _this = this;
@@ -129,9 +136,9 @@
         return _this.parent.collections.gauges.fetch({
           success: function() {
             var data;
-            data = _this.parent.collections.gauges.get(_this.id).attributes.data;
+            data = _this.parent.collections.gauges.get(_this.nid).attributes.data;
             return _this.$el.html($(Template({
-              'id': _this.id,
+              'id': _this.nid,
               'data': data
             })));
           }
@@ -149,10 +156,35 @@
     __extends(TimelineView, _super);
 
     function TimelineView() {
+      this.update = __bind(this.update, this);
       TimelineView.__super__.constructor.apply(this, arguments);
     }
 
     TimelineView.prototype.template = _.template($('#gauge-timeline-template').html());
+
+    TimelineView.prototype.initialize = function(options) {
+      this.nid = options.nid;
+      this.parent = options.parent;
+      this.timeElement = $("#time-" + this.nid);
+      console.log(this.nid);
+      dispatch.on("tick:rtc", this.update);
+      return this;
+    };
+
+    TimelineView.prototype.update = function() {
+      var hours, meridian, minutes, now, seconds;
+      now = new Date;
+      hours = now.getHours();
+      minutes = now.getMinutes();
+      seconds = now.getSeconds();
+      meridian = hours < 12 ? "AM" : "PM";
+      if (hours > 12) hours -= 12;
+      if (hours === 0) hours = 12;
+      if (minutes < 10) minutes = "0" + minutes;
+      if (seconds < 10) seconds = "0" + seconds;
+      console.log(this.timeElement);
+      return $("#time-" + this.nid).text("" + hours + ":" + minutes + ":" + seconds + " " + meridian);
+    };
 
     return TimelineView;
 
@@ -166,20 +198,6 @@
       TimeView.__super__.constructor.apply(this, arguments);
     }
 
-    TimeView.prototype.updateTime = function() {
-      var hours, meridian, minutes, now, seconds;
-      now = new Date;
-      hours = now.getHours();
-      minutes = now.getMinutes();
-      seconds = now.getSeconds();
-      meridian = hours < 12 ? "AM" : "PM";
-      if (hours > 12) hours -= 12;
-      if (hours === 0) hours = 12;
-      if (minutes < 10) minutes = "0" + minutes;
-      if (seconds < 10) seconds = "0" + seconds;
-      return this.$("#time span").text("" + hours + ":" + minutes + ":" + seconds + " " + meridian);
-    };
-
     return TimeView;
 
   })(views.GaugeView);
@@ -189,8 +207,11 @@
     __extends(DashboardView, _super);
 
     function DashboardView() {
+      this.incrementTick = __bind(this.incrementTick, this);
       DashboardView.__super__.constructor.apply(this, arguments);
     }
+
+    DashboardView.prototype.ticks = 0;
 
     DashboardView.prototype.views = [];
 
@@ -205,7 +226,7 @@
 
     DashboardView.prototype.initialize = function(options) {
       this.el = $(options.el);
-      console.log(this.collections);
+      this.incrementTick();
       return this;
     };
 
@@ -225,10 +246,17 @@
           nid: gauge_id,
           id: ele
         });
-        console.log(k_instance.el);
         _this.el.append(k_instance.render().el);
         return _this.views.push(k_instance);
       });
+      return this;
+    };
+
+    DashboardView.prototype.incrementTick = function() {
+      dispatch.trigger('tick:increment');
+      this._intervalFetch = window.setTimeout(this.incrementTick, 100);
+      if (this.ticks % 10 === 0) dispatch.trigger('tick:rtc');
+      this.ticks++;
       return this;
     };
 
