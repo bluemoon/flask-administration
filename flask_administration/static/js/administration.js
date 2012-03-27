@@ -1,5 +1,5 @@
 (function() {
-  var $, BASE_URL, TemplateManager, collections, dashboard, dispatch, models, views,
+  var $, BASE_URL, Emitter, TemplateManager, Time, collections, dashboard, models, views,
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; },
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
@@ -16,9 +16,9 @@
 
   views = {};
 
-  dispatch = _.extend({}, Backbone.Events);
-
   dashboard = {};
+
+  Emitter = _.extend({}, Backbone.Events);
 
   TemplateManager = {
     templates: {},
@@ -48,6 +48,61 @@
       });
     }
   };
+
+  Time = (function() {
+
+    function Time(options) {
+      this.timezone = 'UTC' != null ? 'UTC' : options.timezone;
+      this.nowLocal = new Date;
+      this.nowUTC = new Date(this.nowLocal.getUTCFullYear(), this.nowLocal.getUTCMonth(), this.nowLocal.getUTCDate(), this.nowLocal.getUTCHours(), this.nowLocal.getUTCMinutes(), this.nowLocal.getUTCSeconds());
+      this.tz(this.timezone);
+    }
+
+    Time.prototype.current_tz_offset = function() {
+      var current_date, gmt_offset;
+      current_date = new Date;
+      return gmt_offset = current_date.getTimezoneOffset() / 60;
+    };
+
+    Time.prototype.tz = function(tz) {
+      switch (tz) {
+        case 'PST':
+          this.offset = -8;
+          break;
+        case 'MST':
+          this.offset = -7;
+          break;
+        case 'CST':
+          this.offset = -6;
+          break;
+        case 'EST':
+          this.offset = -5;
+      }
+      return this;
+    };
+
+    Time.prototype.nowString = function() {
+      var hours, meridian, minutes, now, offset, seconds;
+      if (this.timezone === 'UTC') {
+        now = this.nowUTC;
+      } else {
+        offset = this.nowUTC.getTime() + (3600000 * this.offset);
+        now = new Date(offset);
+      }
+      hours = now.getHours();
+      minutes = now.getMinutes();
+      seconds = now.getSeconds();
+      meridian = hours < 12 ? "AM" : "PM";
+      if (hours > 12) hours -= 12;
+      if (hours === 0) hours = 12;
+      if (minutes < 10) minutes = "0" + minutes;
+      if (seconds < 10) seconds = "0" + seconds;
+      return "" + hours + ":" + minutes + ":" + seconds + " " + meridian;
+    };
+
+    return Time;
+
+  })();
 
   models.Gauge = (function(_super) {
 
@@ -124,11 +179,9 @@
     GaugeView.prototype.initialize = function(options) {
       this.nid = options.nid;
       this.parent = options.parent;
-      dispatch.on("tick:rtc", this.update);
+      _.bindAll(this, "render");
       return this;
     };
-
-    GaugeView.prototype.update = function() {};
 
     GaugeView.prototype.render = function() {
       var _this = this;
@@ -137,10 +190,13 @@
           success: function() {
             var data;
             data = _this.parent.collections.gauges.get(_this.nid).attributes.data;
-            return _this.$el.html($(Template({
+            _this.$el.html($(Template({
               'id': _this.nid,
               'data': data
             })));
+            return _this.$el.draggable({
+              snap: '#main'
+            });
           }
         });
       });
@@ -151,71 +207,79 @@
 
   })(Backbone.View);
 
-  views.TimelineView = (function(_super) {
-
-    __extends(TimelineView, _super);
-
-    function TimelineView() {
-      this.update = __bind(this.update, this);
-      TimelineView.__super__.constructor.apply(this, arguments);
-    }
-
-    TimelineView.prototype.template = _.template($('#gauge-timeline-template').html());
-
-    TimelineView.prototype.initialize = function(options) {
-      this.nid = options.nid;
-      this.parent = options.parent;
-      this.timeElement = $("#time-" + this.nid);
-      console.log(this.nid);
-      dispatch.on("tick:rtc", this.update);
-      return this;
-    };
-
-    TimelineView.prototype.update = function() {
-      var hours, meridian, minutes, now, seconds;
-      now = new Date;
-      hours = now.getHours();
-      minutes = now.getMinutes();
-      seconds = now.getSeconds();
-      meridian = hours < 12 ? "AM" : "PM";
-      if (hours > 12) hours -= 12;
-      if (hours === 0) hours = 12;
-      if (minutes < 10) minutes = "0" + minutes;
-      if (seconds < 10) seconds = "0" + seconds;
-      console.log(this.timeElement);
-      return $("#time-" + this.nid).text("" + hours + ":" + minutes + ":" + seconds + " " + meridian);
-    };
-
-    return TimelineView;
-
-  })(views.GaugeView);
-
   views.TimeView = (function(_super) {
 
     __extends(TimeView, _super);
 
     function TimeView() {
+      this.update = __bind(this.update, this);
       TimeView.__super__.constructor.apply(this, arguments);
     }
+
+    TimeView.prototype.template = _.template($('#gauge-timeline-template').html());
+
+    TimeView.prototype.timezoneInteger = 0;
+
+    TimeView.prototype.initialize = function(options) {
+      var _this = this;
+      this.nid = options.nid;
+      this.parent = options.parent;
+      this.timeElement = $("#time-" + this.nid);
+      this.parent.collections.gauges.fetch({
+        success: function() {
+          _this.tz = _this.parent.collections.gauges.get(_this.nid).get('timezone');
+          switch (_this.tz) {
+            case 'EST':
+              _this.timezoneInteger = -5;
+              break;
+            case 'PST':
+              _this.timezoneInteger = -8;
+          }
+          return Emitter.on('tick:rtc', _this.update);
+        }
+      });
+      return this;
+    };
+
+    TimeView.prototype.update = function() {
+      var now;
+      now = new Time({
+        timezone: this.tz
+      });
+      return $("#time-" + this.nid).text(now.nowString());
+    };
 
     return TimeView;
 
   })(views.GaugeView);
 
-  views.DashboardView = (function(_super) {
+  views.TimelineView = (function(_super) {
 
-    __extends(DashboardView, _super);
+    __extends(TimelineView, _super);
 
-    function DashboardView() {
-      this.incrementTick = __bind(this.incrementTick, this);
-      DashboardView.__super__.constructor.apply(this, arguments);
+    function TimelineView() {
+      TimelineView.__super__.constructor.apply(this, arguments);
     }
 
-    DashboardView.prototype.ticks = 0;
+    return TimelineView;
 
-    DashboardView.prototype.views = [];
+  })(views.GaugeView);
 
-    DashboardView.prototype.collections = {
+  views.Dashboard = (function(_super) {
+
+    __extends(Dashboard, _super);
+
+    function Dashboard() {
+      this.incrementTick = __bind(this.incrementTick, this);
+      this.startRTC = __bind(this.startRTC, this);
+      Dashboard.__super__.constructor.apply(this, arguments);
+    }
+
+    Dashboard.prototype.ticks = 0;
+
+    Dashboard.prototype.views = [];
+
+    Dashboard.prototype.collections = {
       dashboards: new collections.Dashboards({
         url: '/admin/dashboard/load'
       }),
@@ -224,19 +288,60 @@
       })
     };
 
-    DashboardView.prototype.initialize = function(options) {
+    Dashboard.prototype.initialize = function(options) {
+      var _this = this;
       this.el = $(options.el);
-      this.incrementTick();
+      _.bindAll(this, 'render');
+      try {
+        (function() {
+          _this.Jugs = new Juggernaut;
+          return _this.hasJugs = true;
+        });
+      } catch (e) {
+        (function() {
+          console.log(e);
+          return _this.hasJugs = false;
+        });
+      }
+      this.startTimerOrChannel(options);
       return this;
     };
 
-    DashboardView.prototype.render = function() {
+    Dashboard.prototype.startTimerOrChannel = function(options) {
+      if (this.hasJugs) {
+        this.startRTC();
+        return this.openChannel(options.channel);
+      } else {
+        return this.incrementTick();
+      }
+    };
+
+    Dashboard.prototype.openChannel = function(channelName) {
+      return this.Jugs.subscribe(channelName, function(data) {
+        return Emitter.trigger(chanelName, data);
+      });
+    };
+
+    Dashboard.prototype.startRTC = function() {
+      this._interval = window.setTimeout(this.startRTC, 1000);
+      Emitter.trigger('tick:rtc');
+      return this;
+    };
+
+    Dashboard.prototype.incrementTick = function() {
+      this._interval = window.setTimeout(this.incrementTick, 500);
+      if (this.ticks % 2 === 0) Emitter.trigger('tick:rtc');
+      this.ticks++;
+      return this;
+    };
+
+    Dashboard.prototype.render = function() {
       var _this = this;
       ($('#js-loading')).remove();
       this.views = [];
       this.el.empty();
       this.collections.dashboards.map(function(item) {
-        var ele, gauge, gauge_id, k_instance, klass;
+        var ele, element, gauge, gauge_id, k_instance, klass;
         gauge = item.get('gauge');
         gauge_id = item.get('id');
         klass = views[gauge.type];
@@ -246,21 +351,14 @@
           nid: gauge_id,
           id: ele
         });
-        _this.el.append(k_instance.render().el);
+        element = k_instance.render().el;
+        _this.el.append(element);
         return _this.views.push(k_instance);
       });
       return this;
     };
 
-    DashboardView.prototype.incrementTick = function() {
-      dispatch.trigger('tick:increment');
-      this._intervalFetch = window.setTimeout(this.incrementTick, 100);
-      if (this.ticks % 10 === 0) dispatch.trigger('tick:rtc');
-      this.ticks++;
-      return this;
-    };
-
-    DashboardView.prototype.preRender = function() {
+    Dashboard.prototype.preRender = function() {
       var _this = this;
       return this.collections.dashboards.fetch({
         success: function() {
@@ -269,13 +367,13 @@
       });
     };
 
-    return DashboardView;
+    return Dashboard;
 
   })(Backbone.View);
 
   $(function() {
     var appView;
-    appView = new views.DashboardView({
+    appView = new views.Dashboard({
       el: $('#main')
     });
     return appView.preRender();

@@ -36,3 +36,5 @@ To install the lastest development version run the following commands::
 	sudo python setup.py install
 
 
+Basic Configuration
+--------------------

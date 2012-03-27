@@ -34,15 +34,11 @@ def log(id):
 @admin.route("/dashboard/load/", defaults={'dashboard':'default'})
 @admin.route("/dashboard/load/<dashboard>")
 def load_dashboard(dashboard):
-	return make_json_response([{'id':1, 'gauge': {'type':'TimelineView'}},
-							   {'id':2, 'gauge': {'type':'TimelineView'}}, 
-							   {'id':3, 'gauge': {'type':'TimelineView'}},
-							   {'id':4, 'gauge': {'type':'TimelineView'}}])
+	return make_json_response([{'id':1, 'gauge': {'type':'TimeView'}},
+							   {'id':2, 'gauge': {'type':'TimeView'}}])
  
 @admin.route("/dashboard/gauge/", defaults={'gauge_id':'1'})
 @admin.route("/dashboard/gauge/<gauge_id>")
 def load_gauge(gauge_id):
-	return make_json_response([{'id':1, 'data':1}, 
-							   {'id':2, 'data': ['el1', 'el2']}, 
-							   {'id':3, 'data': ['el1', 'el2']},
-							   {'id':4, 'data': ['el1', 'el2']},])
+	return make_json_response([{'id':1, 'timezone': 'PST'}, 
+							   {'id':2, 'timezone': 'EST'},])

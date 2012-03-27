@@ -5,6 +5,10 @@ dashboard
 ----------
 The dashboard is built on top of backbone.js
 
+.. js:class:: models.Gauge
+
+
+
 metrics
 --------
 

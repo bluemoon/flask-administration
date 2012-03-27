@@ -8,8 +8,9 @@ BASE_URL = 'http://127.0.0.1:5000/admin'
 models = {}
 collections = {}
 views = {}
-dispatch = _.extend({}, Backbone.Events)
 dashboard = {}
+
+Emitter = _.extend({}, Backbone.Events)
 
 TemplateManager = 
   templates: {}
@@ -23,7 +24,6 @@ TemplateManager =
     if _(@name).endsWith 'html'
       @fetch(name, callback)
 
-
   fetch: (name, callback) ->
     $.ajax '/admin/static/views/' + name,
       type: 'GET'
@@ -35,9 +35,50 @@ TemplateManager =
         callback(@template)
 
 
+class Time
+  constructor: (options) ->
+    @timezone = 'UTC' ? options.timezone
+    @nowLocal = new Date
+    @nowUTC = new Date @nowLocal.getUTCFullYear(), 
+                       @nowLocal.getUTCMonth(), 
+                       @nowLocal.getUTCDate(),  
+                       @nowLocal.getUTCHours(), 
+                       @nowLocal.getUTCMinutes(), 
+                       @nowLocal.getUTCSeconds()
+    @tz(@timezone)
+
+  current_tz_offset: ->
+    current_date = new Date
+    gmt_offset = current_date.getTimezoneOffset() / 60
+
+  tz: (tz) ->
+    switch tz
+      when 'PST' then @offset = -8
+      when 'MST' then @offset = -7
+      when 'CST' then @offset = -6
+      when 'EST' then @offset = -5
+    this
+
+  nowString: ->
+    if @timezone == 'UTC'
+      now = @nowUTC
+    else
+      offset = @nowUTC.getTime() + (3600000 * @offset)
+      now = new Date offset
+
+    hours    = now.getHours()
+    minutes  = now.getMinutes()
+    seconds  = now.getSeconds()
+    meridian = if hours < 12 then "AM" else "PM"
+    hours   -= 12 if hours > 12
+    hours    = 12 if hours == 0
+    minutes  = "0#{minutes}" if minutes < 10
+    seconds  = "0#{seconds}" if seconds < 10
+    "#{hours}:#{minutes}:#{seconds} #{meridian}"
+
 ##: Models
 class models.Gauge extends Backbone.Model
-
+  
 class models.Dashboard extends Backbone.Model
 
 ##: Collections
@@ -60,11 +101,8 @@ class views.GaugeView extends Backbone.View
   initialize: (options) ->
     @nid = options.nid
     @parent = options.parent
-    dispatch.on("tick:rtc", @update)
+    _.bindAll this, "render"
     this
-
-  update: ->
-
 
   render: ->
     TemplateManager.get 'gauge-template', (Template) =>
@@ -73,36 +111,39 @@ class views.GaugeView extends Backbone.View
         @$el.html ($ Template
           'id': @nid
           'data': data)
+        ## Make the bad boys draggable
+        @$el.draggable
+          snap: '#main'
+
     this
 
 
-class views.TimelineView extends views.GaugeView
+class views.TimeView extends views.GaugeView
   template: _.template($('#gauge-timeline-template').html())
+  timezoneInteger: 0
+
   initialize: (options) ->
     @nid = options.nid
     @parent = options.parent
     @timeElement = $("#time-" + @nid)
-    console.log @nid
-    dispatch.on("tick:rtc", @update)
+    @parent.collections.gauges.fetch
+      success: () =>
+        @tz = @parent.collections.gauges.get(@nid).get('timezone')
+        switch @tz
+          when 'EST' then @timezoneInteger = -5
+          when 'PST' then @timezoneInteger = -8
+        Emitter.on 'tick:rtc', @update
     this
 
   update: =>
-    now      = new Date
-    hours    = now.getHours()
-    minutes  = now.getMinutes()
-    seconds  = now.getSeconds()
-    meridian = if hours < 12 then "AM" else "PM"
-    hours   -= 12 if hours > 12
-    hours    = 12 if hours == 0
-    minutes  = "0#{minutes}" if minutes < 10
-    seconds  = "0#{seconds}" if seconds < 10
-    console.log @timeElement
-    $("#time-" + @nid).text("#{hours}:#{minutes}:#{seconds} #{meridian}")
+    now = new Time
+      timezone: @tz
+    $("#time-" + @nid).text(now.nowString())
 
-class views.TimeView extends views.GaugeView
+class views.TimelineView extends views.GaugeView
   
 
-class views.DashboardView extends Backbone.View
+class views.Dashboard extends Backbone.View
   ticks: 0
   views: []
   collections:
@@ -114,9 +155,39 @@ class views.DashboardView extends Backbone.View
 
   initialize: (options) ->
     @el = $ options.el
-    @incrementTick()
+    _.bindAll(this, 'render');
+    try () =>
+      @Jugs = new Juggernaut
+      @hasJugs = true
+    catch e then () =>
+      console.log e
+      @hasJugs = false 
+    @startTimerOrChannel(options)
     this
   
+  startTimerOrChannel: (options) ->
+    if @hasJugs
+      @startRTC()
+      @openChannel(options.channel)
+    else
+      @incrementTick()
+
+  openChannel: (channelName) ->
+    @Jugs.subscribe channelName, (data) ->
+      Emitter.trigger chanelName, data
+
+  startRTC: =>
+    @_interval = window.setTimeout @startRTC, 1000
+    Emitter.trigger('tick:rtc')
+    this
+
+  incrementTick: =>
+    @_interval = window.setTimeout @incrementTick, 500
+    if @ticks % 2 == 0
+      Emitter.trigger('tick:rtc')
+    @ticks++
+    this
+
   render: ->
     ($ '#js-loading').remove()
     @views = []
@@ -130,28 +201,17 @@ class views.DashboardView extends Backbone.View
         parent: this
         nid: gauge_id
         id: ele
-      @el.append k_instance.render().el
+      element = k_instance.render().el
+      @el.append element
       @views.push k_instance
-
-    #result = (item.render().el for item in @views)
-    #console.log result
     this
-    
-  incrementTick: =>        
-    dispatch.trigger('tick:increment')
-    @_intervalFetch = window.setTimeout @incrementTick, 100
-    if @ticks % 10 == 0
-      dispatch.trigger('tick:rtc')
-    @ticks++
-    @
-
-
+  
   preRender: ->
     @collections.dashboards.fetch success: () =>
       @render()
 
 $ ->
-  appView = new views.DashboardView
+  appView = new views.Dashboard
     el: $ '#main'
   appView.preRender()
 
