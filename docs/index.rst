@@ -1,6 +1,12 @@
 Welcome to Flask-Administration's documentation!
 ================================================
 
+Project Goal
+-------------
+
+The idea behind the project is to build a dashboard for adminstration in a way that it's both useful for business and its
+useful for small companies, It's not meant to be a do everything dashboard right now. It's currently in an unusable state
+but I hope some of the main functionality comes around soon.
 
 Contents:
 -----------
