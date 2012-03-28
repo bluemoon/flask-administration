@@ -35,10 +35,13 @@ def log(id):
 @admin.route("/dashboard/load/<dashboard>")
 def load_dashboard(dashboard):
 	return make_json_response([{'id':1, 'gauge': {'type':'TimeView'}},
-							   {'id':2, 'gauge': {'type':'TimeView'}}])
+							   {'id':2, 'gauge': {'type':'TimeView'}},
+							   {'id':3, 'gauge': {'type':'BarView'}}])
  
 @admin.route("/dashboard/gauge/", defaults={'gauge_id':'1'})
 @admin.route("/dashboard/gauge/<gauge_id>")
 def load_gauge(gauge_id):
 	return make_json_response([{'id':1, 'timezone': 'PST'}, 
-							   {'id':2, 'timezone': 'EST'},])
+							   {'id':2, 'timezone': 'EST'},
+							   {'id':3, 'bar': [[55, 20, 13, 32, 5, 1, 2, 10], [10, 2, 1, 5, 32, 13, 20, 55], [12, 20, 30]]}
+							   ])

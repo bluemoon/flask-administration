@@ -6,8 +6,6 @@
 
   $ = jQuery;
 
-  _.mixin(_.string.exports());
-
   BASE_URL = 'http://127.0.0.1:5000/admin';
 
   models = {};
@@ -20,14 +18,15 @@
 
   Emitter = _.extend({}, Backbone.Events);
 
+  _.mixin(_.string.exports());
+
   TemplateManager = {
     templates: {},
     get: function(name, callback) {
-      var template;
       name.replace("#", "");
-      template = this.templates[name];
-      if (template) {
-        callback(template);
+      console.log(this.templates[name]);
+      if (this.templates[name + '.html'] !== void 0) {
+        callback(this.templates[name + '.html']);
       } else {
         this.fetch(name + '.html', callback);
       }
@@ -42,6 +41,7 @@
           return ($('body')).append('AJAX Error: #{textStatus}');
         },
         success: function(data, textStatus, jqXHR) {
+          _this.templates[name] = _.template(($(data)).html());
           _this.template = _.template(($(data)).html());
           return callback(_this.template);
         }
@@ -265,6 +265,63 @@
 
   })(views.GaugeView);
 
+  views.BarView = (function(_super) {
+
+    __extends(BarView, _super);
+
+    function BarView() {
+      this.render = __bind(this.render, this);
+      BarView.__super__.constructor.apply(this, arguments);
+    }
+
+    BarView.prototype.initialize = function(options) {
+      Emitter.on('tick:increment', this.render);
+      return BarView.__super__.initialize.call(this, options);
+    };
+
+    BarView.prototype.data = function() {
+      return [[Math.random()], [Math.random()], [Math.random()]];
+    };
+
+    BarView.prototype.render = function() {
+      var _this = this;
+      TemplateManager.get('bar-template', function(Template) {
+        return _this.parent.collections.gauges.fetch({
+          success: function() {
+            var barData, data;
+            data = _this.parent.collections.gauges.get(_this.nid);
+            _this.$el.html($(Template({
+              'id': _this.nid,
+              'data': data
+            })));
+            _this.$el.draggable({
+              snap: '#main'
+            });
+            barData = data.get('bar');
+            _this.raphael = Raphael('canvas-' + _this.nid, 370, 250);
+            _this.chart = _this.raphael.barchart(10, 10, 360, 250, _this.data());
+            _this.tempChart = _this.raphael.barchart(10, 10, 360, 250, _this.data());
+            $.each(_this.chart.bars[0], function(k, v) {
+              v.animate({
+                path: _this.chart.bars[0][k].attr('path')
+              }, 200);
+              return v.value[0] = Math.random();
+            });
+            return _this.tempChart.remove();
+          }
+        });
+      });
+      return this;
+    };
+
+    BarView.prototype._fin = function() {
+      return this.flag = this.raphael.popup();
+    };
+
+    return BarView;
+
+  })(views.GaugeView);
+
   views.Dashboard = (function(_super) {
 
     __extends(Dashboard, _super);
@@ -331,6 +388,7 @@
     Dashboard.prototype.incrementTick = function() {
       this._interval = window.setTimeout(this.incrementTick, 500);
       if (this.ticks % 2 === 0) Emitter.trigger('tick:rtc');
+      Emitter.trigger('tick:increment');
       this.ticks++;
       return this;
     };

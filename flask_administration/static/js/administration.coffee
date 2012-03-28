@@ -1,24 +1,22 @@
 $ = jQuery
 
-_.mixin _.string.exports()
-
-
 BASE_URL = 'http://127.0.0.1:5000/admin'
 
 models = {}
 collections = {}
 views = {}
 dashboard = {}
-
 Emitter = _.extend({}, Backbone.Events)
+
+_.mixin _.string.exports()
 
 TemplateManager = 
   templates: {}
   get: (name, callback) ->
     name.replace "#", ""
-    template = @templates[name]
-    if template
-      callback(template)
+    console.log @templates[name]
+    if @templates[name + '.html'] != undefined
+      callback(@templates[name + '.html'])
     else
       @fetch(name + '.html', callback)
     if _(@name).endsWith 'html'
@@ -31,6 +29,7 @@ TemplateManager =
       error: (jqXHR, textStatus, errorThrown) ->
         ($ 'body').append 'AJAX Error: #{textStatus}'
       success: (data, textStatus, jqXHR) =>
+        @templates[name] = _.template ($ data).html()
         @template = _.template ($ data).html()
         callback(@template)
 
@@ -141,7 +140,41 @@ class views.TimeView extends views.GaugeView
     $("#time-" + @nid).text(now.nowString())
 
 class views.TimelineView extends views.GaugeView
-  
+
+class views.BarView extends views.GaugeView
+  initialize: (options) ->
+    Emitter.on 'tick:increment', @render
+    super options
+
+  data: ->
+    [[Math.random()], [Math.random()], [Math.random()]]
+
+  render: =>
+    TemplateManager.get 'bar-template', (Template) =>
+      @parent.collections.gauges.fetch success: () =>
+        data = @parent.collections.gauges.get(@nid)
+        @$el.html ($ Template
+          'id': @nid
+          'data': data)
+        ## Make the bad boys draggable
+        @$el.draggable
+          snap: '#main'
+        barData = data.get 'bar'
+        @raphael = Raphael 'canvas-' + @nid, 370, 250
+        @chart = @raphael.barchart 10, 10, 360, 250, @data()
+        @tempChart = @raphael.barchart 10, 10, 360, 250, @data()
+        #console.log @tempChart, @tempChart.bars[0][0]
+        $.each @chart.bars[0], (k, v) =>
+          #console.log [k, v, v.value[0]], @chart, @tempChart, v, @tempChart.bars[0][k]
+          v.animate 
+            path: @chart.bars[0][k].attr('path'), 200
+
+          v.value[0] = Math.random()
+        @tempChart.remove()
+    this
+
+  _fin: ->
+    @flag = @raphael.popup()
 
 class views.Dashboard extends Backbone.View
   ticks: 0
@@ -162,6 +195,7 @@ class views.Dashboard extends Backbone.View
     catch e then () =>
       console.log e
       @hasJugs = false 
+
     @startTimerOrChannel(options)
     this
   
@@ -185,9 +219,10 @@ class views.Dashboard extends Backbone.View
     @_interval = window.setTimeout @incrementTick, 500
     if @ticks % 2 == 0
       Emitter.trigger('tick:rtc')
+    Emitter.trigger('tick:increment')
     @ticks++
     this
-
+    
   render: ->
     ($ '#js-loading').remove()
     @views = []
