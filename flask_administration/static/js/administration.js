@@ -24,7 +24,6 @@
     templates: {},
     get: function(name, callback) {
       name.replace("#", "");
-      console.log(this.templates[name]);
       if (this.templates[name + '.html'] !== void 0) {
         callback(this.templates[name + '.html']);
       } else {
@@ -275,7 +274,7 @@
     }
 
     BarView.prototype.initialize = function(options) {
-      Emitter.on('tick:increment', this.render);
+      Emitter.on('tick:rtc', this.render);
       return BarView.__super__.initialize.call(this, options);
     };
 
@@ -312,10 +311,6 @@
         });
       });
       return this;
-    };
-
-    BarView.prototype._fin = function() {
-      return this.flag = this.raphael.popup();
     };
 
     return BarView;

@@ -14,7 +14,6 @@ TemplateManager =
   templates: {}
   get: (name, callback) ->
     name.replace "#", ""
-    console.log @templates[name]
     if @templates[name + '.html'] != undefined
       callback(@templates[name + '.html'])
     else
@@ -143,7 +142,7 @@ class views.TimelineView extends views.GaugeView
 
 class views.BarView extends views.GaugeView
   initialize: (options) ->
-    Emitter.on 'tick:increment', @render
+    Emitter.on 'tick:rtc', @render
     super options
 
   data: ->
@@ -163,9 +162,7 @@ class views.BarView extends views.GaugeView
         @raphael = Raphael 'canvas-' + @nid, 370, 250
         @chart = @raphael.barchart 10, 10, 360, 250, @data()
         @tempChart = @raphael.barchart 10, 10, 360, 250, @data()
-        #console.log @tempChart, @tempChart.bars[0][0]
         $.each @chart.bars[0], (k, v) =>
-          #console.log [k, v, v.value[0]], @chart, @tempChart, v, @tempChart.bars[0][k]
           v.animate 
             path: @chart.bars[0][k].attr('path'), 200
 
@@ -173,8 +170,6 @@ class views.BarView extends views.GaugeView
         @tempChart.remove()
     this
 
-  _fin: ->
-    @flag = @raphael.popup()
 
 class views.Dashboard extends Backbone.View
   ticks: 0

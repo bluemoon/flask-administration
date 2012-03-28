@@ -1,0 +1,15 @@
+<script type="text/template" id="timeline-template">    
+  <div class="span4 well gauge" id="gauge-<%= id %>">
+	<div style="border-bottom: 1px solid #EEE; padding: 3px 5px;">
+		<a class="close" href="#">&times;</a>
+		<h4>Time</h4>
+	</div><!-- / -->
+	<h2 id="time-<%= id %>"></h2>
+    
+    <ul class="nav nav-tabs nav-stacked">
+	<% _.each(data, function(d) {  %>
+	  <li><%= d %></li>
+	<% }); %> 
+    </ul>
+  </div>
+</script>
