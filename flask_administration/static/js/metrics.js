@@ -1,29 +1,21 @@
 (function() {
-  var events, metrics_dashboard;
+  var UnifiedEvents;
 
-  events = (function() {
+  UnifiedEvents = (function() {
 
-    function events(key, endpoint) {
+    function UnifiedEvents(key, endpoint) {
       this.key = key;
       this.endpoint = endpoint;
     }
 
-    events.prototype.push = function(event) {
+    UnifiedEvents.prototype.push = function(event) {
       return $.ajax({
         url: this.endpoint + '/e',
         context: document.body
       });
     };
 
-    return events;
-
-  })();
-
-  metrics_dashboard = (function() {
-
-    function metrics_dashboard() {}
-
-    return metrics_dashboard;
+    return UnifiedEvents;
 
   })();
 

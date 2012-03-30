@@ -1,11 +1,10 @@
-class events
-	constructor: (@key, @endpoint) ->
+class UnifiedEvents
+  constructor: (@key, @endpoint) ->
+    
+  push: (event) ->
+    $.ajax
+      url: @endpoint + '/e'
+      context: document.body
+    
 
-	push: (event) ->
-		$.ajax
-			url: @endpoint + '/e'
-			context: document.body
-		
-
-class metrics_dashboard
-	
+  

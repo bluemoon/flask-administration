@@ -7,6 +7,8 @@
 """
 from flask import jsonify, Blueprint, request, Response, render_template
 from flask_administration.utils import (static_folder, template_folder, encode_model)
+from flask_administration import apachelog
+
 #from flask_administration.blueprints import event_blueprint
 from mongoengine import *
 
@@ -128,9 +130,17 @@ def events():
     return Response(response=result)
 
 
-
-
 mongoengine.signals.post_save.connect(Event.post_save, sender=Event)
 
 
-
+@event_blueprint.route('/log/nginx/')
+def log_lighttpd():
+    format = r'%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"'
+    p = apachelog.parser(format)
+    data = []
+    for line in open('access.log'):
+        try:
+           data.append(p.parse(line))
+        except:
+           pass
+    return jsonify(data=data)
