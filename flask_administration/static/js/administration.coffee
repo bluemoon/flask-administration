@@ -172,13 +172,14 @@ class views.BarView extends views.GaugeView
 
 
 class views.DotView extends views.GaugeView
-  x: 5
+  x: 10
   y: 20
   sizeX: 12
   sizeY: 12
-  padX: 3
-  padY: 3
-
+  padX: 2
+  padY: 2
+  baseColor: "#ff9900"
+  baseStroke: "#ffffff"
   render: =>
     TemplateManager.get 'bar-template', (Template) =>
       @parent.collections.gauges.fetch success: () =>
@@ -196,7 +197,6 @@ class views.DotView extends views.GaugeView
         row = 0
         column = 0
         for position in [0...@x*@y]
-          
           # Stride is @y
           if position % @y == 0
             row++
@@ -208,8 +208,17 @@ class views.DotView extends views.GaugeView
           console.log positionX, positionY
           c = @paper.rect positionX, positionY, @sizeX, @sizeY, 0
           c.attr
-            fill: "red"
-            stroke: "red"
+            fill: @baseColor
+            stroke: @baseStroke
+
+          f_in = () ->
+            this.stop().animate({transform: "s1.5 1.5 "}, 250, "elastic")
+          f_out = () ->
+            this.stop().animate({transform: "s1.0 1.0 "}, 250, "elastic")
+
+          c.mouseover f_in
+          c.mouseout f_out
+
 
           items.push c
 

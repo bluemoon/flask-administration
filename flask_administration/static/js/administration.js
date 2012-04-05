@@ -318,7 +318,7 @@
       DotView.__super__.constructor.apply(this, arguments);
     }
 
-    DotView.prototype.x = 5;
+    DotView.prototype.x = 10;
 
     DotView.prototype.y = 20;
 
@@ -326,16 +326,20 @@
 
     DotView.prototype.sizeY = 12;
 
-    DotView.prototype.padX = 3;
+    DotView.prototype.padX = 2;
 
-    DotView.prototype.padY = 3;
+    DotView.prototype.padY = 2;
+
+    DotView.prototype.baseColor = "#ff9900";
+
+    DotView.prototype.baseStroke = "#ffffff";
 
     DotView.prototype.render = function() {
       var _this = this;
       TemplateManager.get('bar-template', function(Template) {
         return _this.parent.collections.gauges.fetch({
           success: function() {
-            var barData, c, column, data, items, position, positionX, positionY, row, _ref, _results;
+            var barData, c, column, data, f_in, f_out, items, position, positionX, positionY, row, _ref, _results;
             data = _this.parent.collections.gauges.get(_this.nid);
             _this.$el.html($(Template({
               'id': _this.nid,
@@ -361,9 +365,21 @@
               console.log(positionX, positionY);
               c = _this.paper.rect(positionX, positionY, _this.sizeX, _this.sizeY, 0);
               c.attr({
-                fill: "red",
-                stroke: "red"
+                fill: _this.baseColor,
+                stroke: _this.baseStroke
               });
+              f_in = function() {
+                return this.stop().animate({
+                  transform: "s1.5 1.5 "
+                }, 250, "elastic");
+              };
+              f_out = function() {
+                return this.stop().animate({
+                  transform: "s1.0 1.0 "
+                }, 250, "elastic");
+              };
+              c.mouseover(f_in);
+              c.mouseout(f_out);
               _results.push(items.push(c));
             }
             return _results;
