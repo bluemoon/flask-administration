@@ -36,18 +36,37 @@ event_blueprint.db = mongoengine.connect(db='events')
 jug = Juggernaut()
 
 
-
-class Event(mongoengine.Document):
+class EventDocument(mongoengine.Document):
     name = StringField()
+    ip = StringField()
+    type = StringField()
     time = FloatField()
     key = StringField()
     identity = StringField()
     custom = DictField()
 
-    @classmethod
-    def post_save(cls, sender, document, *args, **kwargs):
-        result = json.dumps(document, default=encode_model)
-        jug.publish('event-{}'.format(), result)
+    #@classmethod
+    #def post_save(cls, sender, document, *args, **kwargs):
+    #    result = json.dumps(document, default=encode_model)
+        #jug.publish('event-{}'.format(), result)
+
+
+class Event(object):
+    pass
+
+
+class Events(object):
+    def from_log(self):
+        format = r'%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"'
+        p = apachelog.parser(format)
+        data = []
+        with open('access.log') as f:
+            for line in f:
+                try:
+                    data.append(p.parse(line))
+                except:
+                    pass
+        return jsonify(data=data)
 
 
 
@@ -61,7 +80,7 @@ def store_event(event_dict):
 
     converted = [{k: v} for k, v in custom_properties.items()]
 
-    e = Event(name=event_dict.get(EVENT), 
+    e = EventDocument(name=event_dict.get(EVENT), 
               time=time.time(), 
               identity=event_dict.get(IDENT),
               custom=custom_properties)
@@ -117,11 +136,11 @@ def events():
         after = float(request.args.get('after'))
     
     if before and not after:
-        events = Event.objects(time__lt=before)
+        events = EventDocument.objects(time__lt=before)
     elif after and not before:
-        events = Event.objects(time__gt=after)
+        events = EventDocument.objects(time__gt=after)
     elif after and before:
-        events = Event.objects(time__lt=before, time__gt=after)
+        events = EventDocument.objects(time__lt=before, time__gt=after)
     else:
         result = json.dumps(Event.objects.all(), default=encode_model)
         return Response(response=result)
@@ -130,7 +149,7 @@ def events():
     return Response(response=result)
 
 
-mongoengine.signals.post_save.connect(Event.post_save, sender=Event)
+#mongoengine.signals.post_save.connect(EventDocument.post_save, sender=EventDocument)
 
 
 @event_blueprint.route('/log/nginx/')

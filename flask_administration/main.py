@@ -1,6 +1,6 @@
 from flask_administration.utils import (_get_admin_extension_dir, encode_model, make_json_response)
 from flask_administration.blueprints import admin
-from flask_administration.metrics import Event
+from flask_administration.metrics import EventDocument
 
 from flask import render_template, request, jsonify
 
@@ -16,7 +16,7 @@ def metrics():
 @admin.route("/metrics/events")
 def events():
 	""" The view for /metrics/events """
-	return render_template('admin/metrics.events.html', events=Event.objects.all())
+	return render_template('admin/metrics.events.html', events=EventDocument.objects.all())
 
 @admin.route("/metrics/keys")
 def event_keys():
