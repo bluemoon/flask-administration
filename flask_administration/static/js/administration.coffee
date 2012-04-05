@@ -172,8 +172,12 @@ class views.BarView extends views.GaugeView
 
 
 class views.DotView extends views.GaugeView
-  data: ->
-    [[3], [3], [3]]
+  x: 5
+  y: 20
+  sizeX: 12
+  sizeY: 12
+  padX: 3
+  padY: 3
 
   render: =>
     TemplateManager.get 'bar-template', (Template) =>
@@ -186,15 +190,29 @@ class views.DotView extends views.GaugeView
         @$el.draggable
           snap: '#main'
         barData = data.get 'bar'
-        @raphael = Raphael 'canvas-' + @nid, 370, 250
-        @chart = @raphael.barchart 10, 10, 360, 250, @data()
-        #@tempChart = @raphael.barchart 10, 10, 360, 250, @data()
-        #$.each @chart.bars[0], (k, v) =>
-        #  v.animate 
-        #    path: @chart.bars[0][k].attr('path'), 200
+        @paper = Raphael 'canvas-' + @nid, 370, 250
 
-        # v.value[0] = Math.random()
-        #@tempChart.remove()
+        items = []
+        row = 0
+        column = 0
+        for position in [0...@x*@y]
+          
+          # Stride is @y
+          if position % @y == 0
+            row++
+            column = 0
+          column++
+
+          positionX = column * (@sizeX + @padX)
+          positionY = row * (@sizeY + @padY)
+          console.log positionX, positionY
+          c = @paper.rect positionX, positionY, @sizeX, @sizeY, 0
+          c.attr
+            fill: "red"
+            stroke: "red"
+
+          items.push c
+
     this
 
 

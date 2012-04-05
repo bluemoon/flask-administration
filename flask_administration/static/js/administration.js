@@ -318,16 +318,24 @@
       DotView.__super__.constructor.apply(this, arguments);
     }
 
-    DotView.prototype.data = function() {
-      return [[3], [3], [3]];
-    };
+    DotView.prototype.x = 5;
+
+    DotView.prototype.y = 20;
+
+    DotView.prototype.sizeX = 12;
+
+    DotView.prototype.sizeY = 12;
+
+    DotView.prototype.padX = 3;
+
+    DotView.prototype.padY = 3;
 
     DotView.prototype.render = function() {
       var _this = this;
       TemplateManager.get('bar-template', function(Template) {
         return _this.parent.collections.gauges.fetch({
           success: function() {
-            var barData, data;
+            var barData, c, column, data, items, position, positionX, positionY, row, _ref, _results;
             data = _this.parent.collections.gauges.get(_this.nid);
             _this.$el.html($(Template({
               'id': _this.nid,
@@ -337,8 +345,28 @@
               snap: '#main'
             });
             barData = data.get('bar');
-            _this.raphael = Raphael('canvas-' + _this.nid, 370, 250);
-            return _this.chart = _this.raphael.barchart(10, 10, 360, 250, _this.data());
+            _this.paper = Raphael('canvas-' + _this.nid, 370, 250);
+            items = [];
+            row = 0;
+            column = 0;
+            _results = [];
+            for (position = 0, _ref = _this.x * _this.y; 0 <= _ref ? position < _ref : position > _ref; 0 <= _ref ? position++ : position--) {
+              if (position % _this.y === 0) {
+                row++;
+                column = 0;
+              }
+              column++;
+              positionX = column * (_this.sizeX + _this.padX);
+              positionY = row * (_this.sizeY + _this.padY);
+              console.log(positionX, positionY);
+              c = _this.paper.rect(positionX, positionY, _this.sizeX, _this.sizeY, 0);
+              c.attr({
+                fill: "red",
+                stroke: "red"
+              });
+              _results.push(items.push(c));
+            }
+            return _results;
           }
         });
       });
