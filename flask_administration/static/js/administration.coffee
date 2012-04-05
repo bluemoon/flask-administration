@@ -171,6 +171,33 @@ class views.BarView extends views.GaugeView
     this
 
 
+class views.DotView extends views.GaugeView
+  data: ->
+    [[3], [3], [3]]
+
+  render: =>
+    TemplateManager.get 'bar-template', (Template) =>
+      @parent.collections.gauges.fetch success: () =>
+        data = @parent.collections.gauges.get(@nid)
+        @$el.html ($ Template
+          'id': @nid
+          'data': data)
+        ## Make the bad boys draggable
+        @$el.draggable
+          snap: '#main'
+        barData = data.get 'bar'
+        @raphael = Raphael 'canvas-' + @nid, 370, 250
+        @chart = @raphael.barchart 10, 10, 360, 250, @data()
+        #@tempChart = @raphael.barchart 10, 10, 360, 250, @data()
+        #$.each @chart.bars[0], (k, v) =>
+        #  v.animate 
+        #    path: @chart.bars[0][k].attr('path'), 200
+
+        # v.value[0] = Math.random()
+        #@tempChart.remove()
+    this
+
+
 class views.Dashboard extends Backbone.View
   ticks: 0
   views: []

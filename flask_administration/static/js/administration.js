@@ -309,6 +309,46 @@
 
   })(views.GaugeView);
 
+  views.DotView = (function(_super) {
+
+    __extends(DotView, _super);
+
+    function DotView() {
+      this.render = __bind(this.render, this);
+      DotView.__super__.constructor.apply(this, arguments);
+    }
+
+    DotView.prototype.data = function() {
+      return [[3], [3], [3]];
+    };
+
+    DotView.prototype.render = function() {
+      var _this = this;
+      TemplateManager.get('bar-template', function(Template) {
+        return _this.parent.collections.gauges.fetch({
+          success: function() {
+            var barData, data;
+            data = _this.parent.collections.gauges.get(_this.nid);
+            _this.$el.html($(Template({
+              'id': _this.nid,
+              'data': data
+            })));
+            _this.$el.draggable({
+              snap: '#main'
+            });
+            barData = data.get('bar');
+            _this.raphael = Raphael('canvas-' + _this.nid, 370, 250);
+            return _this.chart = _this.raphael.barchart(10, 10, 360, 250, _this.data());
+          }
+        });
+      });
+      return this;
+    };
+
+    return DotView;
+
+  })(views.GaugeView);
+
   views.Dashboard = (function(_super) {
 
     __extends(Dashboard, _super);
