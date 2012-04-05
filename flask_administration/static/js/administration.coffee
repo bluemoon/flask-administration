@@ -166,12 +166,20 @@ class views.BulletView extends views.GaugeView
     d.measures
 
 class views.BarView extends views.GaugeView
+  height: 100
+  width: 35
+  
+
   initialize: (options) ->
-    Emitter.on 'tick:rtc', @render
+    @t = 1297110663
+    @v = 70
     super options
 
-  data: ->
-    [[3], [3], [3]]
+  next: ->
+    return {
+      time: ++@t,
+      value: v = ~~Math.max(10, Math.min(90, @v + 10 * (Math.random() - .5)))
+    }
 
   render: =>
     TemplateManager.get 'bar-template', (Template) =>
@@ -181,18 +189,105 @@ class views.BarView extends views.GaugeView
           'id': @nid
           'data': data)
         ## Make the bad boys draggable
+
         @$el.draggable
           snap: '#main'
-        barData = data.get 'bar'
-        @raphael = Raphael 'canvas-' + @nid, 370, 250
-        @chart = @raphael.barchart 10, 10, 360, 250, @data()
-        #@tempChart = @raphael.barchart 10, 10, 360, 250, @data()
-        #$.each @chart.bars[0], (k, v) =>
-        #  v.animate 
-        #    path: @chart.bars[0][k].attr('path'), 200
 
-        # v.value[0] = Math.random()
-        #@tempChart.remove()
+         # start time (seconds since epoch)
+        data = d3.range(10).map(@next) # starting dataset
+        redraw = =>
+          rect = chart.selectAll("rect")
+          .data(data, (d) ->
+            d.time
+          )
+
+          rect.enter().insert("rect", "line")
+          .attr("x", (d, i) ->
+            x(i) - .5
+          )
+          .attr("y", (d) => 
+            @height - y(d.value) - .5
+          )
+          .attr("width", @width)
+          .attr("height", (d) -> 
+            y(d.value))
+          
+          rect.transition()
+          .duration(1000)
+          .attr("x", (d, i) -> 
+            x(i) - .5)
+          
+          rect.exit()
+          .transition()
+          .duration(1000)
+          .attr("x", (d, i) ->
+            x(i - 1) - .5 )
+          .remove()
+        
+        x = d3.scale.linear()
+        .domain([0, 1])
+        .range([0, @width])
+        
+        y = d3.scale.linear()
+        .domain([0, 100])
+        .rangeRound([0, @height])
+
+        chart = d3.select('#canvas-'+@nid).append("svg")
+        .attr("class", "chart")
+        .attr("width", @width * data.length - 1)
+        .attr("height", @height)
+
+        chart.selectAll("rect")
+        .data(data)
+        .enter().append("rect")
+        .attr("x", (d, i) ->
+          x(i) - .5 )
+        .attr("y", (d) => 
+          @height - y(d.value) - .5)
+        .attr("width", @width)
+        .attr("height", (d) -> 
+          y(d.value))
+        
+        _interval = =>
+          data.shift()
+          data.push(@next())
+          redraw()
+
+        setInterval _interval, 1500
+
+
+       
+        console.log data
+        
+
+        
+
+
+        #chart.selectAll('rect')
+        #.data(data)
+        #.enter()
+        #.append("rect")
+        #.attr("y", y)
+        #.attr("width", x)
+        #.attr("height", y.rangeBand())
+
+        #chart.selectAll("text")
+        #.data(data)
+        #.enter().append("text")
+        #.attr("x", x)
+        #.#attr("y", (d) -> y(d) + y.rangeBand() / 2)
+        #.attr("dx", -3) # padding-right
+        #.attr("dy", ".35em") # vertical-align: middle
+        #.attr("text-anchor", "end") # text-align: right
+        #.text(String)
+    
+          
+        
+
+
+        
+        
+        
     this
 
 

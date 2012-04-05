@@ -322,13 +322,22 @@
       BarView.__super__.constructor.apply(this, arguments);
     }
 
+    BarView.prototype.height = 100;
+
+    BarView.prototype.width = 35;
+
     BarView.prototype.initialize = function(options) {
-      Emitter.on('tick:rtc', this.render);
+      this.t = 1297110663;
+      this.v = 70;
       return BarView.__super__.initialize.call(this, options);
     };
 
-    BarView.prototype.data = function() {
-      return [[3], [3], [3]];
+    BarView.prototype.next = function() {
+      var v;
+      return {
+        time: ++this.t,
+        value: v = ~~Math.max(10, Math.min(90, this.v + 10 * (Math.random() - .5)))
+      };
     };
 
     BarView.prototype.render = function() {
@@ -336,7 +345,7 @@
       TemplateManager.get('bar-template', function(Template) {
         return _this.parent.collections.gauges.fetch({
           success: function() {
-            var barData, data;
+            var chart, data, redraw, x, y, _interval;
             data = _this.parent.collections.gauges.get(_this.nid);
             _this.$el.html($(Template({
               'id': _this.nid,
@@ -345,9 +354,43 @@
             _this.$el.draggable({
               snap: '#main'
             });
-            barData = data.get('bar');
-            _this.raphael = Raphael('canvas-' + _this.nid, 370, 250);
-            return _this.chart = _this.raphael.barchart(10, 10, 360, 250, _this.data());
+            data = d3.range(10).map(_this.next);
+            redraw = function() {
+              var rect;
+              rect = chart.selectAll("rect").data(data, function(d) {
+                return d.time;
+              });
+              rect.enter().insert("rect", "line").attr("x", function(d, i) {
+                return x(i) - .5;
+              }).attr("y", function(d) {
+                return _this.height - y(d.value) - .5;
+              }).attr("width", _this.width).attr("height", function(d) {
+                return y(d.value);
+              });
+              rect.transition().duration(1000).attr("x", function(d, i) {
+                return x(i) - .5;
+              });
+              return rect.exit().transition().duration(1000).attr("x", function(d, i) {
+                return x(i - 1) - .5;
+              }).remove();
+            };
+            x = d3.scale.linear().domain([0, 1]).range([0, _this.width]);
+            y = d3.scale.linear().domain([0, 100]).rangeRound([0, _this.height]);
+            chart = d3.select('#canvas-' + _this.nid).append("svg").attr("class", "chart").attr("width", _this.width * data.length - 1).attr("height", _this.height);
+            chart.selectAll("rect").data(data).enter().append("rect").attr("x", function(d, i) {
+              return x(i) - .5;
+            }).attr("y", function(d) {
+              return _this.height - y(d.value) - .5;
+            }).attr("width", _this.width).attr("height", function(d) {
+              return y(d.value);
+            });
+            _interval = function() {
+              data.shift();
+              data.push(_this.next());
+              return redraw();
+            };
+            setInterval(_interval, 1500);
+            return console.log(data);
           }
         });
       });
