@@ -10,6 +10,16 @@ Emitter = _.extend({}, Backbone.Events)
 
 _.mixin _.string.exports()
 
+dash:
+  "Total Notifications":
+    source: "http://localhost:5000/"
+    GaugeLabel:
+      parent: "#hero-one"
+      title: "Notifications Served"
+      type: "max"
+  
+
+
 TemplateManager = 
   templates: {}
   get: (name, callback) ->
@@ -140,6 +150,21 @@ class views.TimeView extends views.GaugeView
 
 class views.TimelineView extends views.GaugeView
 
+
+class views.BulletView extends views.GaugeView
+  orient: "left"
+  reverse: false
+  duration: 0
+  width: 380
+  height: 30
+  tickFormat: null
+  bulletRanges: (d) ->
+    d.ranges
+  bulletMarkers: (d) ->
+    d.markers
+  bulletMeasures: (d) ->
+    d.measures
+
 class views.BarView extends views.GaugeView
   initialize: (options) ->
     Emitter.on 'tick:rtc', @render
@@ -170,6 +195,38 @@ class views.BarView extends views.GaugeView
         #@tempChart.remove()
     this
 
+
+class views.ArcView extends views.GaugeView
+  initialize: (options) ->
+    Emitter.on 'tick:rtc', @render
+    super options
+
+  data: ->
+    [[3], [3], [3]]
+
+  arc: (positionX, positionY, size, start, end) ->
+    start = start * Math.PI / 180
+    arcCoef = end * Math.PI / 180
+    path = [
+      "M", positionX, positionY,
+      "L", positionX + size * Math.cos start, positionY - size * Math.sin start,
+      "A", size, size, 0, 0, 1, positionX + size * Math.cos arcCoef, positionY - size * Math.sin(arcCoef)
+    ].join(",")
+
+  render: =>
+    TemplateManager.get 'bar-template', (Template) =>
+      @parent.collections.gauges.fetch success: () =>
+        data = @parent.collections.gauges.get(@nid)
+        @$el.html ($ Template
+          'id': @nid
+          'data': data)
+        ## Make the bad boys draggable
+        @$el.draggable
+          snap: '#main'
+        barData = data.get 'bar'
+        @paper = Raphael 'canvas-' + @nid, 370, 250
+
+    this
 
 class views.DotView extends views.GaugeView
   x: 10
@@ -211,6 +268,7 @@ class views.DotView extends views.GaugeView
             fill: @baseColor
             stroke: @baseStroke
 
+          #@c.tag positionX - (@sizeX + @padX), positionY, "test1", 0
           f_in = () ->
             this.stop().animate({transform: "s1.5 1.5 "}, 250, "elastic")
           f_out = () ->

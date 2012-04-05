@@ -20,6 +20,19 @@
 
   _.mixin(_.string.exports());
 
+  ({
+    dash: {
+      "Total Notifications": {
+        source: "http://localhost:5000/",
+        GaugeLabel: {
+          parent: "#hero-one",
+          title: "Notifications Served",
+          type: "max"
+        }
+      }
+    }
+  });
+
   TemplateManager = {
     templates: {},
     get: function(name, callback) {
@@ -264,6 +277,42 @@
 
   })(views.GaugeView);
 
+  views.BulletView = (function(_super) {
+
+    __extends(BulletView, _super);
+
+    function BulletView() {
+      BulletView.__super__.constructor.apply(this, arguments);
+    }
+
+    BulletView.prototype.orient = "left";
+
+    BulletView.prototype.reverse = false;
+
+    BulletView.prototype.duration = 0;
+
+    BulletView.prototype.width = 380;
+
+    BulletView.prototype.height = 30;
+
+    BulletView.prototype.tickFormat = null;
+
+    BulletView.prototype.bulletRanges = function(d) {
+      return d.ranges;
+    };
+
+    BulletView.prototype.bulletMarkers = function(d) {
+      return d.markers;
+    };
+
+    BulletView.prototype.bulletMeasures = function(d) {
+      return d.measures;
+    };
+
+    return BulletView;
+
+  })(views.GaugeView);
+
   views.BarView = (function(_super) {
 
     __extends(BarView, _super);
@@ -306,6 +355,57 @@
     };
 
     return BarView;
+
+  })(views.GaugeView);
+
+  views.ArcView = (function(_super) {
+
+    __extends(ArcView, _super);
+
+    function ArcView() {
+      this.render = __bind(this.render, this);
+      ArcView.__super__.constructor.apply(this, arguments);
+    }
+
+    ArcView.prototype.initialize = function(options) {
+      Emitter.on('tick:rtc', this.render);
+      return ArcView.__super__.initialize.call(this, options);
+    };
+
+    ArcView.prototype.data = function() {
+      return [[3], [3], [3]];
+    };
+
+    ArcView.prototype.arc = function(positionX, positionY, size, start, end) {
+      var arcCoef, path;
+      start = start * Math.PI / 180;
+      arcCoef = end * Math.PI / 180;
+      return path = ["M", positionX, positionY, "L", positionX + size * Math.cos(start, positionY - size * Math.sin(start, "A", size, size, 0, 0, 1, positionX + size * Math.cos(arcCoef, positionY - size * Math.sin(arcCoef))))].join(",");
+    };
+
+    ArcView.prototype.render = function() {
+      var _this = this;
+      TemplateManager.get('bar-template', function(Template) {
+        return _this.parent.collections.gauges.fetch({
+          success: function() {
+            var barData, data;
+            data = _this.parent.collections.gauges.get(_this.nid);
+            _this.$el.html($(Template({
+              'id': _this.nid,
+              'data': data
+            })));
+            _this.$el.draggable({
+              snap: '#main'
+            });
+            barData = data.get('bar');
+            return _this.paper = Raphael('canvas-' + _this.nid, 370, 250);
+          }
+        });
+      });
+      return this;
+    };
+
+    return ArcView;
 
   })(views.GaugeView);
 
