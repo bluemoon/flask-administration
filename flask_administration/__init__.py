@@ -14,7 +14,7 @@ def __version__():
     file_base = os.path.dirname(inspect.getfile(inspect.currentframe()))
     with open(os.path.join(file_base, "VERSION")) as f:
         data = f.read()
-        return '0.1.{}'.format(data)
+        return '0.1.{0}'.format(data)
 
 def view_decorator(f):
     @wraps(f)
