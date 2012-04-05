@@ -1,6 +1,6 @@
 import unittest
 from flask import Flask
-from flask.ext.administration import event_driver
+from flask.ext.administration import metrics
 
 class EventDriverTestCase(unittest.TestCase):
     def setUp(self):
