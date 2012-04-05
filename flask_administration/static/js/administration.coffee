@@ -146,7 +146,7 @@ class views.BarView extends views.GaugeView
     super options
 
   data: ->
-    [[Math.random()], [Math.random()], [Math.random()]]
+    [[3], [3], [3]]
 
   render: =>
     TemplateManager.get 'bar-template', (Template) =>
@@ -161,13 +161,13 @@ class views.BarView extends views.GaugeView
         barData = data.get 'bar'
         @raphael = Raphael 'canvas-' + @nid, 370, 250
         @chart = @raphael.barchart 10, 10, 360, 250, @data()
-        @tempChart = @raphael.barchart 10, 10, 360, 250, @data()
-        $.each @chart.bars[0], (k, v) =>
-          v.animate 
-            path: @chart.bars[0][k].attr('path'), 200
+        #@tempChart = @raphael.barchart 10, 10, 360, 250, @data()
+        #$.each @chart.bars[0], (k, v) =>
+        #  v.animate 
+        #    path: @chart.bars[0][k].attr('path'), 200
 
-          v.value[0] = Math.random()
-        @tempChart.remove()
+        # v.value[0] = Math.random()
+        #@tempChart.remove()
     this
 
 

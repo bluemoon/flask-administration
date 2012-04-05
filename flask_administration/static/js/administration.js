@@ -279,7 +279,7 @@
     };
 
     BarView.prototype.data = function() {
-      return [[Math.random()], [Math.random()], [Math.random()]];
+      return [[3], [3], [3]];
     };
 
     BarView.prototype.render = function() {
@@ -298,15 +298,7 @@
             });
             barData = data.get('bar');
             _this.raphael = Raphael('canvas-' + _this.nid, 370, 250);
-            _this.chart = _this.raphael.barchart(10, 10, 360, 250, _this.data());
-            _this.tempChart = _this.raphael.barchart(10, 10, 360, 250, _this.data());
-            $.each(_this.chart.bars[0], function(k, v) {
-              v.animate({
-                path: _this.chart.bars[0][k].attr('path')
-              }, 200);
-              return v.value[0] = Math.random();
-            });
-            return _this.tempChart.remove();
+            return _this.chart = _this.raphael.barchart(10, 10, 360, 250, _this.data());
           }
         });
       });

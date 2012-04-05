@@ -32,7 +32,6 @@ setup(
     include_package_data=True,
     zip_safe=False,
     platforms='any',
-    long_description=open('README.md').read(),
     classifiers = [
         'License :: OSI Approved :: GNU General Public License (GPL)',
         'Development Status :: 3 - Alpha',
