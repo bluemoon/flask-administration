@@ -126,6 +126,44 @@ class views.GaugeView extends Backbone.View
     this
 
 
+
+class views.SunView extends views.GaugeView
+  height: 410
+  width: 550
+
+  initialize: (options) ->
+    super options
+
+  render: =>
+    TemplateManager.get 'sun-template', (Template) =>
+      @parent.collections.gauges.fetch success: () =>
+        data = @parent.collections.gauges.get(@nid)
+        @$el.html ($ Template
+          'id': @nid
+          'data': data)
+        
+        @$el.draggable
+          snap: '#main'
+
+        xy = d3.geo.mercator().translate([270, 250])
+        path = d3.geo.path().projection(xy)
+        svg = d3.select("#canvas-" + @nid)
+        .append("svg")
+        .attr("width", @width)
+        .attr("height", @height)
+      
+        countries = svg.append("g")
+        .attr("id", "countries")
+
+        d3.json("/admin/static/js/world.json", (json) ->
+          countries.selectAll("path")
+          .data(json.features)
+          .enter().append("path")
+          .attr("d", path)
+        )
+    this
+
+
 class views.TimeView extends views.GaugeView
   template: _.template($('#gauge-timeline-template').html())
   timezoneInteger: 0
@@ -223,7 +261,7 @@ class views.BarView extends views.GaugeView
           .attr("x", (d, i) ->
             x(i - 1) - .5 )
           .remove()
-        
+
         x = d3.scale.linear()
         .domain([0, 1])
         .range([0, @width])
@@ -258,36 +296,6 @@ class views.BarView extends views.GaugeView
 
        
         console.log data
-        
-
-        
-
-
-        #chart.selectAll('rect')
-        #.data(data)
-        #.enter()
-        #.append("rect")
-        #.attr("y", y)
-        #.attr("width", x)
-        #.attr("height", y.rangeBand())
-
-        #chart.selectAll("text")
-        #.data(data)
-        #.enter().append("text")
-        #.attr("x", x)
-        #.#attr("y", (d) -> y(d) + y.rangeBand() / 2)
-        #.attr("dx", -3) # padding-right
-        #.attr("dy", ".35em") # vertical-align: middle
-        #.attr("text-anchor", "end") # text-align: right
-        #.text(String)
-    
-          
-        
-
-
-        
-        
-        
     this
 
 

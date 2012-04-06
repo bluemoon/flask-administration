@@ -34,7 +34,7 @@ def log(id):
 @admin.route("/dashboard/load/", defaults={'dashboard':'default'})
 @admin.route("/dashboard/load/<dashboard>")
 def load_dashboard(dashboard):
-	return make_json_response([{'id':1, 'gauge': {'type':'TimeView'}},
+	return make_json_response([{'id':1, 'gauge': {'type':'SunView'}},
 							   {'id':2, 'gauge': {'type':'DotView'}},
 							   {'id':3, 'gauge': {'type':'BarView'}}])
  

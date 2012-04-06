@@ -219,6 +219,54 @@
 
   })(Backbone.View);
 
+  views.SunView = (function(_super) {
+
+    __extends(SunView, _super);
+
+    function SunView() {
+      this.render = __bind(this.render, this);
+      SunView.__super__.constructor.apply(this, arguments);
+    }
+
+    SunView.prototype.height = 410;
+
+    SunView.prototype.width = 550;
+
+    SunView.prototype.initialize = function(options) {
+      return SunView.__super__.initialize.call(this, options);
+    };
+
+    SunView.prototype.render = function() {
+      var _this = this;
+      TemplateManager.get('sun-template', function(Template) {
+        return _this.parent.collections.gauges.fetch({
+          success: function() {
+            var countries, data, path, svg, xy;
+            data = _this.parent.collections.gauges.get(_this.nid);
+            _this.$el.html($(Template({
+              'id': _this.nid,
+              'data': data
+            })));
+            _this.$el.draggable({
+              snap: '#main'
+            });
+            xy = d3.geo.mercator().translate([270, 250]);
+            path = d3.geo.path().projection(xy);
+            svg = d3.select("#canvas-" + _this.nid).append("svg").attr("width", _this.width).attr("height", _this.height);
+            countries = svg.append("g").attr("id", "countries");
+            return d3.json("/admin/static/js/world.json", function(json) {
+              return countries.selectAll("path").data(json.features).enter().append("path").attr("d", path);
+            });
+          }
+        });
+      });
+      return this;
+    };
+
+    return SunView;
+
+  })(views.GaugeView);
+
   views.TimeView = (function(_super) {
 
     __extends(TimeView, _super);
