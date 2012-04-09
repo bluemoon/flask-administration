@@ -40,8 +40,8 @@ TemplateManager =
     if hasStorage
       item = localStorage.getItem 'template-' + name
       if item != null
-        console.log item
-        return callback(_.template ($ item).html())
+        template = _.template ($ item).html()
+        return callback(template)
 
     $.ajax '/admin/static/views/' + name,
       type: 'GET'
@@ -399,9 +399,14 @@ class views.DotView extends views.GaugeView
 class views.Settings extends Backbone.View
   render: ->
     ($ '#js-loading').remove()
-    ($ '#main').hide()
+    @$el.empty()
     ($ 'li.active').removeClass('active')
     ($ '#settings').addClass('active')
+    TemplateManager.get 'settings-template', (Template) =>
+      console.log @$el
+      ($ @el).append ($ Template())
+      console.log 'hi'
+
 
 class views.Dashboard extends Backbone.View
   ticks: 0
@@ -415,7 +420,6 @@ class views.Dashboard extends Backbone.View
 
   initialize: (options) ->
     @el = $ options.el
-    #_.bindAll(this, 'render');
     try () =>
       @Jugs = new Juggernaut
       @hasJugs = true
@@ -452,13 +456,8 @@ class views.Dashboard extends Backbone.View
   widgetWell: ->
     TemplateManager.get 'widget-well-template', (Template) =>
       $('a.toggles').click () ->
-        console.log 'hi'
         $('#main').toggleClass('span8 span10')
         $('#main-row').append Template
-        #$('#widgets').draggable
-        #  helper: "clone"
-        #  connectToSortable: '#main'
-        #  cursor: 'move'
 
         $('#main').droppable
           drop: () ->
@@ -467,7 +466,6 @@ class views.Dashboard extends Backbone.View
 
         $('#main, .widgets').sortable(
           connectWith: "#main"
-
         ).disableSelection()
 
 
@@ -521,8 +519,9 @@ class views.Dashboard extends Backbone.View
       @render()
 
 class DashboardSpace extends Backbone.Router
-  initialize:
+  initialize: ->
     @settings = new views.Settings
+      el: $ '#main'
     @appView = new views.Dashboard
       el: $ '#main'
 
