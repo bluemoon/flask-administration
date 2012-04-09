@@ -21,6 +21,7 @@ dash:
 
 
 TemplateManager =
+  poisoned: true # for debugging
   templates: {}
   get: (name, callback) ->
     name.replace "#", ""
@@ -39,7 +40,7 @@ TemplateManager =
 
     if hasStorage
       item = localStorage.getItem 'template-' + name
-      if item != null
+      if item != null and not @poisoned
         template = _.template ($ item).html()
         return callback(template)
 
@@ -73,11 +74,7 @@ class collections.Dashboards extends Backbone.Collection
     @url = options.url
 
 ##: Views
-#dashboard.GaugeView = Backbone.View
 class views.GaugeView extends Backbone.View
-  tagName: "div"
-  template: _.template($('#gauge-template').html())
-
   initialize: (options) ->
     @nid = options.nid
     @parent = options.parent
@@ -97,7 +94,6 @@ class views.GaugeView extends Backbone.View
     this
 
 
-
 class views.SunView extends views.GaugeView
   height: 410
   width: 550
@@ -113,8 +109,6 @@ class views.SunView extends views.GaugeView
           'id': @nid
           'data': data)
 
-        #@$el.draggable
-        #  snap: '#main'
 
         xy = d3.geo.mercator().translate([270, 250])
         path = d3.geo.path().projection(xy)
@@ -265,7 +259,7 @@ class views.BarView extends views.GaugeView
           redraw()
 
         if @_timer
-          setInterval _interval, 1500
+          setInterval _interval, localStorage.getItem 'tick-time'
 
     this
 
@@ -357,6 +351,16 @@ class views.DotView extends views.GaugeView
     this
 
 class views.Settings extends Backbone.View
+  events:
+    "change input" :"changed",
+    "change select" :"changed"
+
+  changed: (event) ->
+    target = event.currentTarget
+    console.log target
+    value = $('#' + target.id).val()
+    localStorage.setItem 'tick-time', value
+
   render: ->
     Emitter.trigger 'tick:stop'
     ($ '#js-loading').remove()
@@ -365,7 +369,8 @@ class views.Settings extends Backbone.View
     ($ '#settings').addClass('active')
     TemplateManager.get 'settings-template', (Template) =>
       console.log @$el
-      ($ @el).append ($ Template())
+      ($ @el).append ($ Template
+        tickTime: localStorage.getItem 'tick-time' )
       console.log 'hi'
 
 
@@ -452,7 +457,7 @@ class views.Dashboard extends Backbone.View
 
   incrementTick: =>
     if @_timer
-      @_interval = window.setTimeout @incrementTick, 500
+      @_interval = window.setTimeout @incrementTick, localStorage.getItem 'tick-time'
       if @ticks % 2 == 0
         Emitter.trigger('tick:rtc')
       Emitter.trigger('tick:increment')

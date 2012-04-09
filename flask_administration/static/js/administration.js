@@ -33,6 +33,7 @@ _.mixin(_.string.exports());
 });
 
 TemplateManager = {
+  poisoned: true,
   templates: {},
   get: function(name, callback) {
     name.replace("#", "");
@@ -53,7 +54,7 @@ TemplateManager = {
     }
     if (hasStorage) {
       item = localStorage.getItem('template-' + name);
-      if (item !== null) {
+      if (item !== null && !this.poisoned) {
         template = _.template(($(item)).html());
         return callback(template);
       }
@@ -144,10 +145,6 @@ views.GaugeView = (function(_super) {
   function GaugeView() {
     GaugeView.__super__.constructor.apply(this, arguments);
   }
-
-  GaugeView.prototype.tagName = "div";
-
-  GaugeView.prototype.template = _.template($('#gauge-template').html());
 
   GaugeView.prototype.initialize = function(options) {
     this.nid = options.nid;
@@ -397,7 +394,9 @@ views.BarView = (function(_super) {
             data.push(_this.next());
             return redraw();
           };
-          if (_this._timer) return setInterval(_interval, 1500);
+          if (_this._timer) {
+            return setInterval(_interval, localStorage.getItem('tick-time'));
+          }
         }
       });
     });
@@ -545,6 +544,19 @@ views.Settings = (function(_super) {
     Settings.__super__.constructor.apply(this, arguments);
   }
 
+  Settings.prototype.events = {
+    "change input": "changed",
+    "change select": "changed"
+  };
+
+  Settings.prototype.changed = function(event) {
+    var target, value;
+    target = event.currentTarget;
+    console.log(target);
+    value = $('#' + target.id).val();
+    return localStorage.setItem('tick-time', value);
+  };
+
   Settings.prototype.render = function() {
     var _this = this;
     Emitter.trigger('tick:stop');
@@ -554,7 +566,9 @@ views.Settings = (function(_super) {
     ($('#settings')).addClass('active');
     return TemplateManager.get('settings-template', function(Template) {
       console.log(_this.$el);
-      ($(_this.el)).append($(Template()));
+      ($(_this.el)).append($(Template({
+        tickTime: localStorage.getItem('tick-time')
+      })));
       return console.log('hi');
     });
   };
@@ -676,7 +690,7 @@ views.Dashboard = (function(_super) {
 
   Dashboard.prototype.incrementTick = function() {
     if (this._timer) {
-      this._interval = window.setTimeout(this.incrementTick, 500);
+      this._interval = window.setTimeout(this.incrementTick, localStorage.getItem('tick-time'));
       if (this.ticks % 2 === 0) Emitter.trigger('tick:rtc');
       Emitter.trigger('tick:increment');
       return this.ticks++;
