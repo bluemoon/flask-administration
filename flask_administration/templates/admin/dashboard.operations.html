@@ -1,0 +1,52 @@
+{% extends "admin/base.html" %}
+
+{% block title %}
+Operations dashboard
+{% endblock title %}
+
+{% block extra_head %}
+<script type="text/template" id="gauge-template">
+  <div class="span2 well" id="gauge-<%= id %>">
+    <a class="close">&times;</a>
+  </div>
+</script>
+
+<script type="text/template" id="gauge-timeline-template">
+  <div class="span2 well" id="gauge-<%= id %>">
+    <a class="close">&times;</a>
+    <ul class="nav nav-tabs nav-stacked">
+    <% _.each(data, function(d) {  %>
+      <li><%= d %></li>
+    <% }); %>
+    </ul>
+  </div>
+</script>
+{% endblock extra_head %}
+
+
+
+{% block sidebar %}
+<div class="well sidebar-nav" id="sidebar">
+  <ul class="nav nav-list">
+    <li class="nav-header">Quick Navigation</li>
+    <li class="active">
+      <a href="#"><i class="icon-home"></i>Home</a>
+    </li>
+    <a href="#"><i class="icon-cog"></i>Settings</a>
+
+    <li class="nav-header">Add</li>
+    <a href="#" class="toggles"><i class="icon-plus"></i>Widget</a>
+
+  </ul>
+</div><!--/.well-->
+
+
+{% endblock %}
+
+{% block main %}
+
+<div class="well span4">
+  <h3 id="js-loading">Loading...</h3>
+</div><!-- / -->
+
+{% endblock main %}
