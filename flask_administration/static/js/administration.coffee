@@ -142,8 +142,8 @@ class views.SunView extends views.GaugeView
           'id': @nid
           'data': data)
 
-        @$el.draggable
-          snap: '#main'
+        #@$el.draggable
+        #  snap: '#main'
 
         xy = d3.geo.mercator().translate([270, 250])
         path = d3.geo.path().projection(xy)
@@ -228,8 +228,8 @@ class views.BarView extends views.GaugeView
           'data': data)
         ## Make the bad boys draggable
 
-        @$el.draggable
-          snap: '#main'
+        #@$el.draggable
+        #  snap: '#main'
 
          # start time (seconds since epoch)
         data = d3.range(10).map(@next) # starting dataset
@@ -324,8 +324,8 @@ class views.ArcView extends views.GaugeView
           'id': @nid
           'data': data)
         ## Make the bad boys draggable
-        @$el.draggable
-          snap: '#main'
+        #@$el.draggable
+        #  snap: '#main'
         barData = data.get 'bar'
         @paper = Raphael 'canvas-' + @nid, 370, 250
 
@@ -348,8 +348,8 @@ class views.DotView extends views.GaugeView
           'id': @nid
           'data': data)
         ## Make the bad boys draggable
-        @$el.draggable
-          snap: '#main'
+        #@$el.draggable
+        #  snap: '#main'
         barData = data.get 'bar'
         @paper = Raphael 'canvas-' + @nid, 370, 250
 
@@ -409,19 +409,19 @@ class views.Dashboard extends Backbone.View
     @handleCloseButton()
     @startTimerOrChannel(options)
     @widgetWell()
+    #@toggleSidebar()
+    this
 
-    $('#sidebar-toggles').click () ->
-      $('#sidebar-toggles i').toggleClass('icon-chevron-left icon-chevron-right')
+  toggleSidebar: ->
+    $('#sidebar-toggle').click () ->
+      $('#sidebar-toggle i').toggleClass('icon-chevron-left icon-chevron-right')
 
       $('#sidebar').animate
         width: 'toggle'
         , 250
       $('#main').toggleClass('span10 span12')
 
-    this
-
   handleCloseButton: ->
-    console.log $('.close')
     $('.close').live('click',() ->
       gauge = $(this).parent().parent()
       gauge.remove()
@@ -431,15 +431,28 @@ class views.Dashboard extends Backbone.View
         # Otherwise it's the widget add box
         $('#main').toggleClass('span8 span10')
     )
-    this
-
 
   widgetWell: ->
     TemplateManager.get 'widget-well-template', (Template) =>
-      $('.toggles2').click () ->
-        $('#main').removeClass 'span10'
-        $('#main').addClass 'span8'
+      $('a.toggles').click () ->
+        console.log 'hi'
+        $('#main').toggleClass('span8 span10')
         $('#main-row').append Template
+        #$('#widgets').draggable
+        #  helper: "clone"
+        #  connectToSortable: '#main'
+        #  cursor: 'move'
+
+        $('#main').droppable
+          drop: () ->
+            console.log 'dropped'
+
+
+        $('#main, .widgets').sortable(
+          connectWith: "#main"
+
+        ).disableSelection()
+
 
   startTimerOrChannel: (options) ->
     if @hasJugs
@@ -487,7 +500,17 @@ class views.Dashboard extends Backbone.View
     @collections.dashboards.fetch success: () =>
       @render()
 
-$(document).ready () ->
-  appView = new views.Dashboard
-    el: $ '#main'
-  appView.preRender()
+class DashboardSpace extends Backbone.Router
+  routes:
+    "settings": "settings"
+    "*actions": "default"
+
+  default: (actions) ->
+    console.log actions
+    appView = new views.Dashboard
+      el: $ '#main'
+    appView.preRender()
+
+$ ->
+  router = new DashboardSpace
+  Backbone.history.start()

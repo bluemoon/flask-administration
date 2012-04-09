@@ -1,4 +1,4 @@
-var $, BASE_URL, Emitter, TemplateManager, Time, collections, dashboard, models, views,
+var $, BASE_URL, DashboardSpace, Emitter, TemplateManager, Time, collections, dashboard, models, views,
   __hasProp = Object.prototype.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; },
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
@@ -246,9 +246,6 @@ views.SunView = (function(_super) {
             'id': _this.nid,
             'data': data
           })));
-          _this.$el.draggable({
-            snap: '#main'
-          });
           xy = d3.geo.mercator().translate([270, 250]);
           path = d3.geo.path().projection(xy);
           svg = d3.select("#canvas-" + _this.nid).append("svg").attr("width", _this.width).attr("height", _this.height);
@@ -398,9 +395,6 @@ views.BarView = (function(_super) {
             'id': _this.nid,
             'data': data
           })));
-          _this.$el.draggable({
-            snap: '#main'
-          });
           data = d3.range(10).map(_this.next);
           redraw = function() {
             var rect;
@@ -484,9 +478,6 @@ views.ArcView = (function(_super) {
             'id': _this.nid,
             'data': data
           })));
-          _this.$el.draggable({
-            snap: '#main'
-          });
           barData = data.get('bar');
           return _this.paper = Raphael('canvas-' + _this.nid, 370, 250);
         }
@@ -535,9 +526,6 @@ views.DotView = (function(_super) {
             'id': _this.nid,
             'data': data
           })));
-          _this.$el.draggable({
-            snap: '#main'
-          });
           barData = data.get('bar');
           _this.paper = Raphael('canvas-' + _this.nid, 370, 250);
           items = [];
@@ -623,19 +611,21 @@ views.Dashboard = (function(_super) {
     this.handleCloseButton();
     this.startTimerOrChannel(options);
     this.widgetWell();
-    $('#sidebar-toggles').click(function() {
-      $('#sidebar-toggles i').toggleClass('icon-chevron-left icon-chevron-right');
+    return this;
+  };
+
+  Dashboard.prototype.toggleSidebar = function() {
+    return $('#sidebar-toggle').click(function() {
+      $('#sidebar-toggle i').toggleClass('icon-chevron-left icon-chevron-right');
       $('#sidebar').animate({
         width: 'toggle'
       }, 250);
       return $('#main').toggleClass('span10 span12');
     });
-    return this;
   };
 
   Dashboard.prototype.handleCloseButton = function() {
-    console.log($('.close'));
-    $('.close').live('click', function() {
+    return $('.close').live('click', function() {
       var gauge;
       gauge = $(this).parent().parent();
       gauge.remove();
@@ -645,16 +635,23 @@ views.Dashboard = (function(_super) {
         return $('#main').toggleClass('span8 span10');
       }
     });
-    return this;
   };
 
   Dashboard.prototype.widgetWell = function() {
     var _this = this;
     return TemplateManager.get('widget-well-template', function(Template) {
-      return $('.toggles2').click(function() {
-        $('#main').removeClass('span10');
-        $('#main').addClass('span8');
-        return $('#main-row').append(Template);
+      return $('a.toggles').click(function() {
+        console.log('hi');
+        $('#main').toggleClass('span8 span10');
+        $('#main-row').append(Template);
+        $('#main').droppable({
+          drop: function() {
+            return console.log('dropped');
+          }
+        });
+        return $('#main, .widgets').sortable({
+          connectWith: "#main"
+        }).disableSelection();
       });
     });
   };
@@ -724,10 +721,34 @@ views.Dashboard = (function(_super) {
 
 })(Backbone.View);
 
-$(document).ready(function() {
-  var appView;
-  appView = new views.Dashboard({
-    el: $('#main')
-  });
-  return appView.preRender();
+DashboardSpace = (function(_super) {
+
+  __extends(DashboardSpace, _super);
+
+  function DashboardSpace() {
+    DashboardSpace.__super__.constructor.apply(this, arguments);
+  }
+
+  DashboardSpace.prototype.routes = {
+    "settings": "settings",
+    "*actions": "default"
+  };
+
+  DashboardSpace.prototype["default"] = function(actions) {
+    var appView;
+    console.log(actions);
+    appView = new views.Dashboard({
+      el: $('#main')
+    });
+    return appView.preRender();
+  };
+
+  return DashboardSpace;
+
+})(Backbone.Router);
+
+$(function() {
+  var router;
+  router = new DashboardSpace;
+  return Backbone.history.start();
 });
