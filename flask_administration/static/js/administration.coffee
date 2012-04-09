@@ -410,6 +410,14 @@ class views.Dashboard extends Backbone.View
     @startTimerOrChannel(options)
     @widgetWell()
 
+    $('#sidebar-toggles').click () ->
+      $('#sidebar-toggles i').toggleClass('icon-chevron-left icon-chevron-right')
+
+      $('#sidebar').animate
+        width: 'toggle'
+        , 250
+      $('#main').toggleClass('span10 span12')
+
     this
 
   handleCloseButton: ->
@@ -420,15 +428,15 @@ class views.Dashboard extends Backbone.View
       if _(gauge.attr('id')).startsWith('gauge')
         console.log 'Stopping events from being fired'
       else
-        $('#main').removeClass 'span8'
-        $('#main').addClass 'span10'
+        # Otherwise it's the widget add box
+        $('#main').toggleClass('span8 span10')
     )
     this
 
 
   widgetWell: ->
     TemplateManager.get 'widget-well-template', (Template) =>
-      $('.toggles').click () ->
+      $('.toggles2').click () ->
         $('#main').removeClass 'span10'
         $('#main').addClass 'span8'
         $('#main-row').append Template

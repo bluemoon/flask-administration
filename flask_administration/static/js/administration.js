@@ -623,6 +623,13 @@ views.Dashboard = (function(_super) {
     this.handleCloseButton();
     this.startTimerOrChannel(options);
     this.widgetWell();
+    $('#sidebar-toggles').click(function() {
+      $('#sidebar-toggles i').toggleClass('icon-chevron-left icon-chevron-right');
+      $('#sidebar').animate({
+        width: 'toggle'
+      }, 250);
+      return $('#main').toggleClass('span10 span12');
+    });
     return this;
   };
 
@@ -635,8 +642,7 @@ views.Dashboard = (function(_super) {
       if (_(gauge.attr('id')).startsWith('gauge')) {
         return console.log('Stopping events from being fired');
       } else {
-        $('#main').removeClass('span8');
-        return $('#main').addClass('span10');
+        return $('#main').toggleClass('span8 span10');
       }
     });
     return this;
@@ -645,7 +651,7 @@ views.Dashboard = (function(_super) {
   Dashboard.prototype.widgetWell = function() {
     var _this = this;
     return TemplateManager.get('widget-well-template', function(Template) {
-      return $('.toggles').click(function() {
+      return $('.toggles2').click(function() {
         $('#main').removeClass('span10');
         $('#main').addClass('span8');
         return $('#main-row').append(Template);
