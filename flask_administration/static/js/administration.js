@@ -1,4 +1,4 @@
-var $, BASE_URL, DashboardSpace, Emitter, TemplateManager, Time, collections, dashboard, models, views,
+var $, BASE_URL, DashboardSpace, Emitter, TemplateManager, collections, dashboard, models, views,
   __hasProp = Object.prototype.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; },
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
@@ -76,61 +76,6 @@ TemplateManager = {
     });
   }
 };
-
-Time = (function() {
-
-  function Time(options) {
-    this.timezone = 'UTC' != null ? 'UTC' : options.timezone;
-    this.nowLocal = new Date;
-    this.nowUTC = new Date(this.nowLocal.getUTCFullYear(), this.nowLocal.getUTCMonth(), this.nowLocal.getUTCDate(), this.nowLocal.getUTCHours(), this.nowLocal.getUTCMinutes(), this.nowLocal.getUTCSeconds());
-    this.tz(this.timezone);
-  }
-
-  Time.prototype.current_tz_offset = function() {
-    var current_date, gmt_offset;
-    current_date = new Date;
-    return gmt_offset = current_date.getTimezoneOffset() / 60;
-  };
-
-  Time.prototype.tz = function(tz) {
-    switch (tz) {
-      case 'PST':
-        this.offset = -8;
-        break;
-      case 'MST':
-        this.offset = -7;
-        break;
-      case 'CST':
-        this.offset = -6;
-        break;
-      case 'EST':
-        this.offset = -5;
-    }
-    return this;
-  };
-
-  Time.prototype.nowString = function() {
-    var hours, meridian, minutes, now, offset, seconds;
-    if (this.timezone === 'UTC') {
-      now = this.nowUTC;
-    } else {
-      offset = this.nowUTC.getTime() + (3600000 * this.offset);
-      now = new Date(offset);
-    }
-    hours = now.getHours();
-    minutes = now.getMinutes();
-    seconds = now.getSeconds();
-    meridian = hours < 12 ? "AM" : "PM";
-    if (hours > 12) hours -= 12;
-    if (hours === 0) hours = 12;
-    if (minutes < 10) minutes = "0" + minutes;
-    if (seconds < 10) seconds = "0" + seconds;
-    return "" + hours + ":" + minutes + ":" + seconds + " " + meridian;
-  };
-
-  return Time;
-
-})();
 
 models.Gauge = (function(_super) {
 

@@ -56,48 +56,6 @@ TemplateManager =
           @templates[name] = @template
         callback(@template)
 
-
-class Time
-  constructor: (options) ->
-    @timezone = 'UTC' ? options.timezone
-    @nowLocal = new Date
-    @nowUTC = new Date @nowLocal.getUTCFullYear(),
-                       @nowLocal.getUTCMonth(),
-                       @nowLocal.getUTCDate(),
-                       @nowLocal.getUTCHours(),
-                       @nowLocal.getUTCMinutes(),
-                       @nowLocal.getUTCSeconds()
-    @tz(@timezone)
-
-  current_tz_offset: ->
-    current_date = new Date
-    gmt_offset = current_date.getTimezoneOffset() / 60
-
-  tz: (tz) ->
-    switch tz
-      when 'PST' then @offset = -8
-      when 'MST' then @offset = -7
-      when 'CST' then @offset = -6
-      when 'EST' then @offset = -5
-    this
-
-  nowString: ->
-    if @timezone == 'UTC'
-      now = @nowUTC
-    else
-      offset = @nowUTC.getTime() + (3600000 * @offset)
-      now = new Date offset
-
-    hours    = now.getHours()
-    minutes  = now.getMinutes()
-    seconds  = now.getSeconds()
-    meridian = if hours < 12 then "AM" else "PM"
-    hours   -= 12 if hours > 12
-    hours    = 12 if hours == 0
-    minutes  = "0#{minutes}" if minutes < 10
-    seconds  = "0#{seconds}" if seconds < 10
-    "#{hours}:#{minutes}:#{seconds} #{meridian}"
-
 ##: Models
 class models.Gauge extends Backbone.Model
 
