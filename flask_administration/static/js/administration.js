@@ -631,7 +631,13 @@ views.Dashboard = (function(_super) {
     $('.close').live('click', function() {
       var gauge;
       gauge = $(this).parent().parent();
-      return gauge.remove();
+      gauge.remove();
+      if (_(gauge.attr('id')).startsWith('gauge')) {
+        return console.log('Stopping events from being fired');
+      } else {
+        $('#main').removeClass('span8');
+        return $('#main').addClass('span10');
+      }
     });
     return this;
   };

@@ -417,6 +417,11 @@ class views.Dashboard extends Backbone.View
     $('.close').live('click',() ->
       gauge = $(this).parent().parent()
       gauge.remove()
+      if _(gauge.attr('id')).startsWith('gauge')
+        console.log 'Stopping events from being fired'
+      else
+        $('#main').removeClass 'span8'
+        $('#main').addClass 'span10'
     )
     this
 
