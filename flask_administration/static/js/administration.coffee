@@ -49,10 +49,11 @@ TemplateManager =
       error: (jqXHR, textStatus, errorThrown) ->
         ($ 'body').append 'AJAX Error: #{textStatus}'
       success: (data, textStatus, jqXHR) =>
-        @templates[name] = _.template ($ data).html()
         @template = _.template ($ data).html()
         if hasStorage
           localStorage.setItem 'template-' + name, data
+        else
+          @templates[name] = @template
         callback(@template)
 
 
