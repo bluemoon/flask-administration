@@ -207,7 +207,6 @@ views.GaugeView = (function(_super) {
   GaugeView.prototype.initialize = function(options) {
     this.nid = options.nid;
     this.parent = options.parent;
-    _.bindAll(this, "render");
     return this;
   };
 
@@ -387,6 +386,8 @@ views.BarView = (function(_super) {
 
   BarView.prototype.width = 35;
 
+  BarView.prototype._timer = true;
+
   BarView.prototype.initialize = function(options) {
     var _this = this;
     this.t = 1297110663;
@@ -407,8 +408,8 @@ views.BarView = (function(_super) {
 
   BarView.prototype.render = function() {
     var _this = this;
-    return TemplateManager.get('bar-template', function(Template) {
-      _this.parent.collections.gauges.fetch({
+    TemplateManager.get('bar-template', function(Template) {
+      return _this.parent.collections.gauges.fetch({
         success: function() {
           var chart, data, redraw, x, y, _interval;
           data = _this.parent.collections.gauges.get(_this.nid);
@@ -454,8 +455,8 @@ views.BarView = (function(_super) {
           if (_this._timer) return setInterval(_interval, 1500);
         }
       });
-      return _this;
     });
+    return this;
   };
 
   return BarView;

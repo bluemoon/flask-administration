@@ -123,7 +123,6 @@ class views.GaugeView extends Backbone.View
   initialize: (options) ->
     @nid = options.nid
     @parent = options.parent
-    _.bindAll this, "render"
     this
 
   render: ->
@@ -220,7 +219,7 @@ class views.BulletView extends views.GaugeView
 class views.BarView extends views.GaugeView
   height: 100
   width: 35
-
+  _timer: true
 
   initialize: (options) ->
     @t = 1297110663
@@ -310,7 +309,7 @@ class views.BarView extends views.GaugeView
         if @_timer
           setInterval _interval, 1500
 
-      this
+    this
 
 
 class views.ArcView extends views.GaugeView
