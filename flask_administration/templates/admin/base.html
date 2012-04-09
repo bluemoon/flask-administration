@@ -52,9 +52,9 @@
     }
   </style>
   <link rel="stylesheet" href="{{ static('css/bootstrap-responsive.min.css') }}">
-  <link href="http://fonts.googleapis.com/css?family=Vollkorn&amp;subset=latin" rel="stylesheet" type="text/css">
+  <!--<link href="http://fonts.googleapis.com/css?family=Vollkorn&amp;subset=latin" rel="stylesheet" type="text/css">
   <link href="http://fonts.googleapis.com/css?family=Merriweather:300,regular,700,900" rel="stylesheet" type="text/css" >
-  <link href="http://fonts.googleapis.com/css?family=Inconsolata:regular" rel="stylesheet" type="text/css" >
+  <link href="http://fonts.googleapis.com/css?family=Inconsolata:regular" rel="stylesheet" type="text/css" > -->
   <style type="text/css" media="screen">
     html {
     overflow-y:visible;
@@ -125,16 +125,11 @@
   {% endblock content %}
 
   <!-- bootstrap js -->
-  <script src="{{ static('js/library/jquery.ui.js') }}" type="text/javascript"></script>
-  <script src="{{ static('js/library/bootstrap.js') }}" type="text/javascript"></script>
   <script src="{{ static('js/library/underscore.js') }}" type="text/javascript"></script>
   <script src="{{ static('js/library/underscore.string.js') }}" type="text/javascript"></script>
   <script src="{{ static('js/library/backbone.js') }}" type="text/javascript"></script>
   <script src="{{ static('js/library/raphael.js') }}" type="text/javascript"></script>
-  <script src="{{ static('js/library/g.raphael.js') }}" type="text/javascript"></script>
-  <script src="{{ static('js/library/g.bar.js') }}" type="text/javascript"></script>
   <script src="{{ static('js/library/d3.v2.min.js') }}" type="text/javascript"></script>
-
   <script src="{{ static('js/administration.js') }}" type="text/javascript"></script>
 
   {% block javascript %}

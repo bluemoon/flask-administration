@@ -10,6 +10,8 @@ Emitter = _.extend({}, Backbone.Events)
 
 _.mixin _.string.exports()
 
+timer = true
+
 dash:
   "Total Notifications":
     source: "http://localhost:5000/"
@@ -21,7 +23,7 @@ dash:
 
 
 TemplateManager =
-  poisoned: true # for debugging
+  poisoned: false # for debugging
   templates: {}
   get: (name, callback) ->
     name.replace "#", ""
@@ -171,13 +173,10 @@ class views.BulletView extends views.GaugeView
 class views.BarView extends views.GaugeView
   height: 100
   width: 35
-  _timer: true
 
   initialize: (options) ->
     @t = 1297110663
     @v = 70
-    Emitter.on 'tick:stop', () =>
-      @_timer = false
     super options
 
   next: ->
@@ -258,8 +257,7 @@ class views.BarView extends views.GaugeView
           data.push(@next())
           redraw()
 
-        if @_timer
-          setInterval _interval, localStorage.getItem 'tick-time'
+        Emitter.on 'tick:rtc', _interval
 
     this
 
@@ -330,7 +328,6 @@ class views.DotView extends views.GaugeView
 
           positionX = column * (@sizeX + @padX)
           positionY = row * (@sizeY + @padY)
-          console.log positionX, positionY
           c = @paper.rect positionX, positionY, @sizeX, @sizeY, 0
           c.attr
             fill: @baseColor
@@ -355,15 +352,16 @@ class views.Settings extends Backbone.View
     "change input" :"changed",
     "change select" :"changed"
 
+  initialize: ->
+
+
   changed: (event) ->
     target = event.currentTarget
-    console.log target
     item = $('#' + target.id)
     value = item.val()
     localStorage.setItem 'tick-time', value
     item.val(null)
     item.attr('placeholder', value)
-
 
   render: ->
     Emitter.trigger 'tick:stop'
@@ -372,14 +370,12 @@ class views.Settings extends Backbone.View
     ($ 'li.active').removeClass('active')
     ($ '#settings').addClass('active')
     TemplateManager.get 'settings-template', (Template) =>
-      console.log @$el
       ($ @el).append ($ Template
         tickTime: localStorage.getItem 'tick-time' )
-      console.log 'hi'
+
 
 
 class views.Dashboard extends Backbone.View
-  _timer: true
   ticks: 0
   views: []
   collections:
@@ -399,7 +395,7 @@ class views.Dashboard extends Backbone.View
       @hasJugs = false
 
     Emitter.on 'tick:stop', () =>
-      @_timer = false
+      timer = false
 
     @handleCloseButton()
     @startTimerOrChannel(options)
@@ -447,20 +443,20 @@ class views.Dashboard extends Backbone.View
       @startRTC()
       @openChannel(options.channel)
     else
-      @incrementTick()
+      @startRTC()
 
   openChannel: (channelName) ->
     @Jugs.subscribe channelName, (data) ->
       Emitter.trigger chanelName, data
 
   startRTC: =>
-    if @_timer
+    if timer
       @_interval = window.setTimeout @startRTC, 1000
       Emitter.trigger('tick:rtc')
 
 
   incrementTick: =>
-    if @_timer
+    if timer
       @_interval = window.setTimeout @incrementTick, localStorage.getItem 'tick-time'
       if @ticks % 2 == 0
         Emitter.trigger('tick:rtc')

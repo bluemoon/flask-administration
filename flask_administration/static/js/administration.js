@@ -1,4 +1,4 @@
-var $, BASE_URL, DashboardSpace, Emitter, TemplateManager, collections, dashboard, models, views,
+var $, BASE_URL, DashboardSpace, Emitter, TemplateManager, collections, dashboard, models, timer, views,
   __hasProp = Object.prototype.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; },
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
@@ -19,6 +19,8 @@ Emitter = _.extend({}, Backbone.Events);
 
 _.mixin(_.string.exports());
 
+timer = true;
+
 ({
   dash: {
     "Total Notifications": {
@@ -33,7 +35,7 @@ _.mixin(_.string.exports());
 });
 
 TemplateManager = {
-  poisoned: true,
+  poisoned: false,
   templates: {},
   get: function(name, callback) {
     name.replace("#", "");
@@ -328,15 +330,9 @@ views.BarView = (function(_super) {
 
   BarView.prototype.width = 35;
 
-  BarView.prototype._timer = true;
-
   BarView.prototype.initialize = function(options) {
-    var _this = this;
     this.t = 1297110663;
     this.v = 70;
-    Emitter.on('tick:stop', function() {
-      return _this._timer = false;
-    });
     return BarView.__super__.initialize.call(this, options);
   };
 
@@ -394,9 +390,7 @@ views.BarView = (function(_super) {
             data.push(_this.next());
             return redraw();
           };
-          if (_this._timer) {
-            return setInterval(_interval, localStorage.getItem('tick-time'));
-          }
+          return Emitter.on('tick:rtc', _interval);
         }
       });
     });
@@ -505,7 +499,6 @@ views.DotView = (function(_super) {
             column++;
             positionX = column * (_this.sizeX + _this.padX);
             positionY = row * (_this.sizeY + _this.padY);
-            console.log(positionX, positionY);
             c = _this.paper.rect(positionX, positionY, _this.sizeX, _this.sizeY, 0);
             c.attr({
               fill: _this.baseColor,
@@ -549,10 +542,11 @@ views.Settings = (function(_super) {
     "change select": "changed"
   };
 
+  Settings.prototype.initialize = function() {};
+
   Settings.prototype.changed = function(event) {
     var item, target, value;
     target = event.currentTarget;
-    console.log(target);
     item = $('#' + target.id);
     value = item.val();
     localStorage.setItem('tick-time', value);
@@ -568,11 +562,9 @@ views.Settings = (function(_super) {
     ($('li.active')).removeClass('active');
     ($('#settings')).addClass('active');
     return TemplateManager.get('settings-template', function(Template) {
-      console.log(_this.$el);
-      ($(_this.el)).append($(Template({
+      return ($(_this.el)).append($(Template({
         tickTime: localStorage.getItem('tick-time')
       })));
-      return console.log('hi');
     });
   };
 
@@ -589,8 +581,6 @@ views.Dashboard = (function(_super) {
     this.startRTC = __bind(this.startRTC, this);
     Dashboard.__super__.constructor.apply(this, arguments);
   }
-
-  Dashboard.prototype._timer = true;
 
   Dashboard.prototype.ticks = 0;
 
@@ -620,7 +610,7 @@ views.Dashboard = (function(_super) {
       });
     }
     Emitter.on('tick:stop', function() {
-      return _this._timer = false;
+      return timer = false;
     });
     this.handleCloseButton();
     this.startTimerOrChannel(options);
@@ -674,7 +664,7 @@ views.Dashboard = (function(_super) {
       this.startRTC();
       return this.openChannel(options.channel);
     } else {
-      return this.incrementTick();
+      return this.startRTC();
     }
   };
 
@@ -685,14 +675,14 @@ views.Dashboard = (function(_super) {
   };
 
   Dashboard.prototype.startRTC = function() {
-    if (this._timer) {
+    if (timer) {
       this._interval = window.setTimeout(this.startRTC, 1000);
       return Emitter.trigger('tick:rtc');
     }
   };
 
   Dashboard.prototype.incrementTick = function() {
-    if (this._timer) {
+    if (timer) {
       this._interval = window.setTimeout(this.incrementTick, localStorage.getItem('tick-time'));
       if (this.ticks % 2 === 0) Emitter.trigger('tick:rtc');
       Emitter.trigger('tick:increment');
