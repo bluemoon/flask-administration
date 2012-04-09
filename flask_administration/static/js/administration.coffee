@@ -32,6 +32,17 @@ TemplateManager =
       @fetch(name, callback)
 
   fetch: (name, callback) ->
+    if window.localStorage
+      hasStorage = true
+    else
+      hasStorage = false
+
+    if hasStorage
+      item = localStorage.getItem 'template-' + name
+      if item != null
+        console.log item
+        return callback(_.template ($ item).html())
+
     $.ajax '/admin/static/views/' + name,
       type: 'GET'
       dataType: 'html'
@@ -40,6 +51,8 @@ TemplateManager =
       success: (data, textStatus, jqXHR) =>
         @templates[name] = _.template ($ data).html()
         @template = _.template ($ data).html()
+        if hasStorage
+          localStorage.setItem 'template-' + name, data
         callback(@template)
 
 
@@ -385,6 +398,12 @@ class views.DotView extends views.GaugeView
 
     this
 
+class views.Settings extends Backbone.View
+  initialize: ->
+    ($ '#js-loading').remove()
+    ($ '#main').hide()
+    ($ 'li.active').removeClass('active')
+    ($ '#settings').addClass('active')
 
 class views.Dashboard extends Backbone.View
   ticks: 0
@@ -479,7 +498,10 @@ class views.Dashboard extends Backbone.View
     this
 
   render: ->
+    ($ 'li.active').removeClass('active')
+    ($ '#home').addClass('active')
     ($ '#js-loading').remove()
+    ($ '#main').show()
     @views = []
     @el.empty()
     @collections.dashboards.map (item) =>
@@ -502,8 +524,11 @@ class views.Dashboard extends Backbone.View
 
 class DashboardSpace extends Backbone.Router
   routes:
-    "settings": "settings"
+    "/settings/": "settings"
     "*actions": "default"
+
+  settings: ->
+    settings = new views.Settings
 
   default: (actions) ->
     console.log actions

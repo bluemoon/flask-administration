@@ -44,7 +44,20 @@ TemplateManager = {
     if (_(this.name).endsWith('html')) return this.fetch(name, callback);
   },
   fetch: function(name, callback) {
-    var _this = this;
+    var hasStorage, item,
+      _this = this;
+    if (window.localStorage) {
+      hasStorage = true;
+    } else {
+      hasStorage = false;
+    }
+    if (hasStorage) {
+      item = localStorage.getItem('template-' + name);
+      if (item !== null) {
+        console.log(item);
+        return callback(_.template(($(item)).html()));
+      }
+    }
     return $.ajax('/admin/static/views/' + name, {
       type: 'GET',
       dataType: 'html',
@@ -54,6 +67,7 @@ TemplateManager = {
       success: function(data, textStatus, jqXHR) {
         _this.templates[name] = _.template(($(data)).html());
         _this.template = _.template(($(data)).html());
+        if (hasStorage) localStorage.setItem('template-' + name, data);
         return callback(_this.template);
       }
     });
@@ -571,6 +585,25 @@ views.DotView = (function(_super) {
 
 })(views.GaugeView);
 
+views.Settings = (function(_super) {
+
+  __extends(Settings, _super);
+
+  function Settings() {
+    Settings.__super__.constructor.apply(this, arguments);
+  }
+
+  Settings.prototype.initialize = function() {
+    ($('#js-loading')).remove();
+    ($('#main')).hide();
+    ($('li.active')).removeClass('active');
+    return ($('#settings')).addClass('active');
+  };
+
+  return Settings;
+
+})(Backbone.View);
+
 views.Dashboard = (function(_super) {
 
   __extends(Dashboard, _super);
@@ -687,7 +720,10 @@ views.Dashboard = (function(_super) {
 
   Dashboard.prototype.render = function() {
     var _this = this;
+    ($('li.active')).removeClass('active');
+    ($('#home')).addClass('active');
     ($('#js-loading')).remove();
+    ($('#main')).show();
     this.views = [];
     this.el.empty();
     this.collections.dashboards.map(function(item) {
@@ -730,8 +766,13 @@ DashboardSpace = (function(_super) {
   }
 
   DashboardSpace.prototype.routes = {
-    "settings": "settings",
+    "/settings/": "settings",
     "*actions": "default"
+  };
+
+  DashboardSpace.prototype.settings = function() {
+    var settings;
+    return settings = new views.Settings;
   };
 
   DashboardSpace.prototype["default"] = function(actions) {
