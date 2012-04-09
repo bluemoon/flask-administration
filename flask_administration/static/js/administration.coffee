@@ -306,10 +306,7 @@ class views.BarView extends views.GaugeView
 
         setInterval _interval, 1500
 
-
-
-        console.log data
-    this
+      this
 
 
 class views.ArcView extends views.GaugeView
@@ -399,7 +396,7 @@ class views.DotView extends views.GaugeView
     this
 
 class views.Settings extends Backbone.View
-  initialize: ->
+  render: ->
     ($ '#js-loading').remove()
     ($ '#main').hide()
     ($ 'li.active').removeClass('active')
@@ -523,18 +520,20 @@ class views.Dashboard extends Backbone.View
       @render()
 
 class DashboardSpace extends Backbone.Router
+  initialize:
+    @settings = new views.Settings
+    @appView = new views.Dashboard
+      el: $ '#main'
+
   routes:
     "/settings/": "settings"
     "*actions": "default"
 
   settings: ->
-    settings = new views.Settings
+    @settings.render()
 
   default: (actions) ->
-    console.log actions
-    appView = new views.Dashboard
-      el: $ '#main'
-    appView.preRender()
+    @appView.preRender()
 
 $ ->
   router = new DashboardSpace

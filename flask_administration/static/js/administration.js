@@ -400,8 +400,8 @@ views.BarView = (function(_super) {
 
   BarView.prototype.render = function() {
     var _this = this;
-    TemplateManager.get('bar-template', function(Template) {
-      return _this.parent.collections.gauges.fetch({
+    return TemplateManager.get('bar-template', function(Template) {
+      _this.parent.collections.gauges.fetch({
         success: function() {
           var chart, data, redraw, x, y, _interval;
           data = _this.parent.collections.gauges.get(_this.nid);
@@ -444,12 +444,11 @@ views.BarView = (function(_super) {
             data.push(_this.next());
             return redraw();
           };
-          setInterval(_interval, 1500);
-          return console.log(data);
+          return setInterval(_interval, 1500);
         }
       });
+      return _this;
     });
-    return this;
   };
 
   return BarView;
