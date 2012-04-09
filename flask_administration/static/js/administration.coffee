@@ -17,10 +17,10 @@ dash:
       parent: "#hero-one"
       title: "Notifications Served"
       type: "max"
-  
 
 
-TemplateManager = 
+
+TemplateManager =
   templates: {}
   get: (name, callback) ->
     name.replace "#", ""
@@ -47,11 +47,11 @@ class Time
   constructor: (options) ->
     @timezone = 'UTC' ? options.timezone
     @nowLocal = new Date
-    @nowUTC = new Date @nowLocal.getUTCFullYear(), 
-                       @nowLocal.getUTCMonth(), 
-                       @nowLocal.getUTCDate(),  
-                       @nowLocal.getUTCHours(), 
-                       @nowLocal.getUTCMinutes(), 
+    @nowUTC = new Date @nowLocal.getUTCFullYear(),
+                       @nowLocal.getUTCMonth(),
+                       @nowLocal.getUTCDate(),
+                       @nowLocal.getUTCHours(),
+                       @nowLocal.getUTCMinutes(),
                        @nowLocal.getUTCSeconds()
     @tz(@timezone)
 
@@ -86,7 +86,7 @@ class Time
 
 ##: Models
 class models.Gauge extends Backbone.Model
-  
+
 class models.Dashboard extends Backbone.Model
 
 ##: Collections
@@ -141,7 +141,7 @@ class views.SunView extends views.GaugeView
         @$el.html ($ Template
           'id': @nid
           'data': data)
-        
+
         @$el.draggable
           snap: '#main'
 
@@ -151,7 +151,7 @@ class views.SunView extends views.GaugeView
         .append("svg")
         .attr("width", @width)
         .attr("height", @height)
-      
+
         countries = svg.append("g")
         .attr("id", "countries")
 
@@ -206,7 +206,7 @@ class views.BulletView extends views.GaugeView
 class views.BarView extends views.GaugeView
   height: 100
   width: 35
-  
+
 
   initialize: (options) ->
     @t = 1297110663
@@ -243,18 +243,18 @@ class views.BarView extends views.GaugeView
           .attr("x", (d, i) ->
             x(i) - .5
           )
-          .attr("y", (d) => 
+          .attr("y", (d) =>
             @height - y(d.value) - .5
           )
           .attr("width", @width)
-          .attr("height", (d) -> 
+          .attr("height", (d) ->
             y(d.value))
-          
+
           rect.transition()
           .duration(1000)
-          .attr("x", (d, i) -> 
+          .attr("x", (d, i) ->
             x(i) - .5)
-          
+
           rect.exit()
           .transition()
           .duration(1000)
@@ -265,7 +265,7 @@ class views.BarView extends views.GaugeView
         x = d3.scale.linear()
         .domain([0, 1])
         .range([0, @width])
-        
+
         y = d3.scale.linear()
         .domain([0, 100])
         .rangeRound([0, @height])
@@ -280,12 +280,12 @@ class views.BarView extends views.GaugeView
         .enter().append("rect")
         .attr("x", (d, i) ->
           x(i) - .5 )
-        .attr("y", (d) => 
+        .attr("y", (d) =>
           @height - y(d.value) - .5)
         .attr("width", @width)
-        .attr("height", (d) -> 
+        .attr("height", (d) ->
           y(d.value))
-        
+
         _interval = =>
           data.shift()
           data.push(@next())
@@ -294,7 +294,7 @@ class views.BarView extends views.GaugeView
         setInterval _interval, 1500
 
 
-       
+
         console.log data
     this
 
@@ -398,17 +398,36 @@ class views.Dashboard extends Backbone.View
 
   initialize: (options) ->
     @el = $ options.el
-    _.bindAll(this, 'render');
+    #_.bindAll(this, 'render');
     try () =>
       @Jugs = new Juggernaut
       @hasJugs = true
     catch e then () =>
       console.log e
-      @hasJugs = false 
+      @hasJugs = false
 
+    @handleCloseButton()
     @startTimerOrChannel(options)
+    @widgetWell()
+
     this
-  
+
+  handleCloseButton: ->
+    console.log $('.close')
+    $('.close').live('click',() ->
+      gauge = $(this).parent().parent()
+      gauge.remove()
+    )
+    this
+
+
+  widgetWell: ->
+    TemplateManager.get 'widget-well-template', (Template) =>
+      $('.toggles').click () ->
+        $('#main').removeClass 'span10'
+        $('#main').addClass 'span8'
+        $('#main-row').append Template
+
   startTimerOrChannel: (options) ->
     if @hasJugs
       @startRTC()
@@ -432,7 +451,7 @@ class views.Dashboard extends Backbone.View
     Emitter.trigger('tick:increment')
     @ticks++
     this
-    
+
   render: ->
     ($ '#js-loading').remove()
     @views = []
@@ -450,13 +469,12 @@ class views.Dashboard extends Backbone.View
       @el.append element
       @views.push k_instance
     this
-  
+
   preRender: ->
     @collections.dashboards.fetch success: () =>
       @render()
 
-$ ->
+$(document).ready () ->
   appView = new views.Dashboard
     el: $ '#main'
   appView.preRender()
-

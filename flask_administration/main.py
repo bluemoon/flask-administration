@@ -6,7 +6,7 @@ from flask import render_template, request, jsonify
 
 @admin.route("/")
 def index():
-	return render_template('admin/index.html')
+	return render_template('admin/dashboard.operations.html')
 
 @admin.route("/metrics")
 def metrics():
