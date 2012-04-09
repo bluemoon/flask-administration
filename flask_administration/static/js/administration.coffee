@@ -225,6 +225,8 @@ class views.BarView extends views.GaugeView
   initialize: (options) ->
     @t = 1297110663
     @v = 70
+    Emitter.on 'tick:stop', () =>
+      @_timer = false
     super options
 
   next: ->
@@ -305,7 +307,8 @@ class views.BarView extends views.GaugeView
           data.push(@next())
           redraw()
 
-        setInterval _interval, 1500
+        if @_timer
+          setInterval _interval, 1500
 
       this
 
@@ -398,6 +401,7 @@ class views.DotView extends views.GaugeView
 
 class views.Settings extends Backbone.View
   render: ->
+    Emitter.trigger 'tick:stop'
     ($ '#js-loading').remove()
     @$el.empty()
     ($ 'li.active').removeClass('active')
@@ -409,6 +413,7 @@ class views.Settings extends Backbone.View
 
 
 class views.Dashboard extends Backbone.View
+  _timer: true
   ticks: 0
   views: []
   collections:
@@ -427,10 +432,12 @@ class views.Dashboard extends Backbone.View
       console.log e
       @hasJugs = false
 
+    Emitter.on 'tick:stop', () =>
+      @_timer = false
+
     @handleCloseButton()
     @startTimerOrChannel(options)
     @widgetWell()
-    #@toggleSidebar()
     this
 
   toggleSidebar: ->
@@ -481,17 +488,19 @@ class views.Dashboard extends Backbone.View
       Emitter.trigger chanelName, data
 
   startRTC: =>
-    @_interval = window.setTimeout @startRTC, 1000
-    Emitter.trigger('tick:rtc')
-    this
+    if @_timer
+      @_interval = window.setTimeout @startRTC, 1000
+      Emitter.trigger('tick:rtc')
+
 
   incrementTick: =>
-    @_interval = window.setTimeout @incrementTick, 500
-    if @ticks % 2 == 0
-      Emitter.trigger('tick:rtc')
-    Emitter.trigger('tick:increment')
-    @ticks++
-    this
+    if @_timer
+      @_interval = window.setTimeout @incrementTick, 500
+      if @ticks % 2 == 0
+        Emitter.trigger('tick:rtc')
+      Emitter.trigger('tick:increment')
+      @ticks++
+
 
   render: ->
     ($ 'li.active').removeClass('active')
