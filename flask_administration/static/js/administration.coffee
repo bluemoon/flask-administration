@@ -358,8 +358,12 @@ class views.Settings extends Backbone.View
   changed: (event) ->
     target = event.currentTarget
     console.log target
-    value = $('#' + target.id).val()
+    item = $('#' + target.id)
+    value = item.val()
     localStorage.setItem 'tick-time', value
+    item.val(null)
+    item.attr('placeholder', value)
+
 
   render: ->
     Emitter.trigger 'tick:stop'

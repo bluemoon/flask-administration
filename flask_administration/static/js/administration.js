@@ -550,11 +550,14 @@ views.Settings = (function(_super) {
   };
 
   Settings.prototype.changed = function(event) {
-    var target, value;
+    var item, target, value;
     target = event.currentTarget;
     console.log(target);
-    value = $('#' + target.id).val();
-    return localStorage.setItem('tick-time', value);
+    item = $('#' + target.id);
+    value = item.val();
+    localStorage.setItem('tick-time', value);
+    item.val(null);
+    return item.attr('placeholder', value);
   };
 
   Settings.prototype.render = function() {
