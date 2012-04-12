@@ -1,9 +1,7 @@
-var $, BASE_URL, DashboardSpace, Emitter, TemplateManager, collections, dashboard, models, timer, views,
+var BASE_URL, DashboardSpace, Emitter, TemplateManager, collections, dashboard, log, models, timer, views,
   __hasProp = Object.prototype.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; },
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-
-$ = jQuery;
 
 BASE_URL = 'http://127.0.0.1:5000/admin';
 
@@ -33,6 +31,20 @@ timer = true;
     }
   }
 });
+
+log = {
+  bind: function() {},
+  send: function(item) {
+    $.ajax({
+      type: 'GET',
+      url: '/admin/?hashmonitor=' + encodeURIComponent(item)
+    });
+    return console.log(item);
+  },
+  error: function(item) {
+    return log.send(item);
+  }
+};
 
 TemplateManager = {
   poisoned: false,
@@ -151,12 +163,15 @@ views.GaugeView = (function(_super) {
   GaugeView.prototype.initialize = function(options) {
     this.nid = options.nid;
     this.parent = options.parent;
+    this.template = 'gauge-template';
     return this;
   };
 
+  GaugeView.prototype.update = function() {};
+
   GaugeView.prototype.render = function() {
     var _this = this;
-    TemplateManager.get('gauge-template', function(Template) {
+    TemplateManager.get(this.template, function(Template) {
       return _this.parent.collections.gauges.fetch({
         success: function() {
           var data;
@@ -165,9 +180,7 @@ views.GaugeView = (function(_super) {
             'id': _this.nid,
             'data': data
           })));
-          return _this.$el.draggable({
-            snap: '#main'
-          });
+          return _this.update();
         }
       });
     });
@@ -175,6 +188,30 @@ views.GaugeView = (function(_super) {
   };
 
   return GaugeView;
+
+})(Backbone.View);
+
+views.BusinessEngagement = (function(_super) {
+
+  __extends(BusinessEngagement, _super);
+
+  function BusinessEngagement() {
+    BusinessEngagement.__super__.constructor.apply(this, arguments);
+  }
+
+  BusinessEngagement.prototype.initialize = function() {
+    return this.template = 'gauge-template';
+  };
+
+  BusinessEngagement.prototype.render = function() {
+    var _this = this;
+    TemplateManager.get(this.template, function(Template) {
+      return _this.$el.html($(Template));
+    });
+    return this;
+  };
+
+  return BusinessEngagement;
 
 })(Backbone.View);
 
@@ -190,8 +227,6 @@ views.Settings = (function(_super) {
     "change input": "changed",
     "change select": "changed"
   };
-
-  Settings.prototype.initialize = function() {};
 
   Settings.prototype.changed = function(event) {
     var item, target, value;
@@ -246,7 +281,6 @@ views.Dashboard = (function(_super) {
 
   Dashboard.prototype.initialize = function(options) {
     var _this = this;
-    this.el = $(options.el);
     try {
       (function() {
         _this.Jugs = new Juggernaut;
@@ -339,6 +373,14 @@ views.Dashboard = (function(_super) {
     }
   };
 
+  Dashboard.prototype.Render = function() {
+    ($('li.active')).removeClass('active');
+    ($('#home')).addClass('active');
+    ($('#js-loading')).remove();
+    ($('#main')).show();
+    return ($('#main')).append($('<canvas id="canvas" width="300" height="300"></canvas>'));
+  };
+
   Dashboard.prototype.render = function() {
     var _this = this;
     ($('li.active')).removeClass('active');
@@ -346,32 +388,27 @@ views.Dashboard = (function(_super) {
     ($('#js-loading')).remove();
     ($('#main')).show();
     this.views = [];
-    this.el.empty();
+    this.$el.empty();
     this.collections.dashboards.map(function(item) {
-      var ele, element, gauge, gauge_id, k_instance, klass;
+      var classInstance, className, ele, element, gauge, gaugeId;
       gauge = item.get('gauge');
-      gauge_id = item.get('id');
-      klass = views[gauge.type];
-      ele = '#gauge-' + gauge_id;
-      k_instance = new klass({
-        parent: _this,
-        nid: gauge_id,
-        id: ele
-      });
-      element = k_instance.render().el;
-      _this.el.append(element);
-      return _this.views.push(k_instance);
-    });
-    return this;
-  };
-
-  Dashboard.prototype.preRender = function() {
-    var _this = this;
-    return this.collections.dashboards.fetch({
-      success: function() {
-        return _this.render();
+      gaugeId = item.get('id');
+      ele = '#gauge-' + gaugeId;
+      try {
+        className = views[gauge.type];
+        classInstance = new className({
+          parent: _this,
+          nid: gaugeId,
+          id: ele
+        });
+        element = classInstance.render().el;
+        _this.$el.append(element);
+        return _this.views.push(classInstance);
+      } catch (error) {
+        return log.error(error);
       }
     });
+    return this;
   };
 
   return Dashboard;
@@ -390,14 +427,25 @@ DashboardSpace = (function(_super) {
     this.settings = new views.Settings({
       el: $('#main')
     });
-    return this.appView = new views.Dashboard({
+    this.appView = new views.Dashboard({
       el: $('#main')
+    });
+    this.business = new views.BusinessEngagement({
+      el: $('#main')
+    });
+    return this.dashboard = new collections.Dashboards({
+      url: '/admin/dashboard/load'
     });
   };
 
   DashboardSpace.prototype.routes = {
     "/settings/": "settings",
+    "/business/": "business",
     "*actions": "default"
+  };
+
+  DashboardSpace.prototype.business = function() {
+    return this.business.render();
   };
 
   DashboardSpace.prototype.settings = function() {
@@ -405,7 +453,12 @@ DashboardSpace = (function(_super) {
   };
 
   DashboardSpace.prototype["default"] = function(actions) {
-    return this.appView.preRender();
+    var _this = this;
+    return this.dashboard.fetch({
+      success: function() {
+        return _this.appView.Render();
+      }
+    });
   };
 
   return DashboardSpace;

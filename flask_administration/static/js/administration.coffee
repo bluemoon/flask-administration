@@ -1,5 +1,3 @@
-$ = jQuery
-
 BASE_URL = 'http://127.0.0.1:5000/admin'
 
 models = {}
@@ -21,6 +19,17 @@ dash:
       type: "max"
 
 
+log =
+  bind: () ->
+
+  send: (item) ->
+    $.ajax
+      type: 'GET'
+      url: '/admin/?hashmonitor=' + encodeURIComponent(item)
+    console.log item
+
+  error: (item) ->
+    log.send item
 
 TemplateManager =
   poisoned: false # for debugging
@@ -59,6 +68,7 @@ TemplateManager =
           @templates[name] = @template
         callback(@template)
 
+
 ##: Models
 class models.Gauge extends Backbone.Model
 
@@ -75,23 +85,38 @@ class collections.Dashboards extends Backbone.Collection
   initialize: (options) ->
     @url = options.url
 
+
+
+
 ##: Views
 class views.GaugeView extends Backbone.View
   initialize: (options) ->
     @nid = options.nid
     @parent = options.parent
+    @template = 'gauge-template'
     this
 
+  update: ->
+
   render: ->
-    TemplateManager.get 'gauge-template', (Template) =>
+    TemplateManager.get @template, (Template) =>
       @parent.collections.gauges.fetch success: () =>
         data = @parent.collections.gauges.get(@nid).attributes.data
         @$el.html ($ Template
           'id': @nid
           'data': data)
-        ## Make the bad boys draggable
-        @$el.draggable
-          snap: '#main'
+        @update()
+
+    this
+
+
+class views.BusinessEngagement extends Backbone.View
+  initialize: ->
+    @template = 'gauge-template'
+
+  render: ->
+    TemplateManager.get @template, (Template) =>
+      @$el.html ($ Template)
 
     this
 
@@ -101,9 +126,6 @@ class views.Settings extends Backbone.View
   events:
     "change input" :"changed",
     "change select" :"changed"
-
-  initialize: ->
-
 
   changed: (event) ->
     target = event.currentTarget
@@ -136,7 +158,6 @@ class views.Dashboard extends Backbone.View
       url: '/admin/dashboard/gauge/'
 
   initialize: (options) ->
-    @el = $ options.el
     try () =>
       @Jugs = new Juggernaut
       @hasJugs = true
@@ -213,6 +234,12 @@ class views.Dashboard extends Backbone.View
       Emitter.trigger('tick:increment')
       @ticks++
 
+  Render: ->
+    ($ 'li.active').removeClass('active')
+    ($ '#home').addClass('active')
+    ($ '#js-loading').remove()
+    ($ '#main').show()
+    ($ '#main').append ($ '<canvas id="canvas" width="300" height="300"></canvas>')
 
   render: ->
     ($ 'li.active').removeClass('active')
@@ -220,24 +247,26 @@ class views.Dashboard extends Backbone.View
     ($ '#js-loading').remove()
     ($ '#main').show()
     @views = []
-    @el.empty()
+    @$el.empty()
     @collections.dashboards.map (item) =>
       gauge = item.get('gauge')
-      gauge_id = item.get('id')
-      klass = views[gauge.type]
-      ele = '#gauge-' + gauge_id
-      k_instance = new klass
-        parent: this
-        nid: gauge_id
-        id: ele
-      element = k_instance.render().el
-      @el.append element
-      @views.push k_instance
+      gaugeId = item.get('id')
+      ele = '#gauge-' + gaugeId
+      try
+        className = views[gauge.type]
+        classInstance = new className
+          parent: this
+          nid: gaugeId
+          id: ele
+
+        element = classInstance.render().el
+        @$el.append element
+        @views.push classInstance # maintain access to the subclasses
+      catch error
+        log.error error
+
     this
 
-  preRender: ->
-    @collections.dashboards.fetch success: () =>
-      @render()
 
 class DashboardSpace extends Backbone.Router
   initialize: ->
@@ -245,16 +274,24 @@ class DashboardSpace extends Backbone.Router
       el: $ '#main'
     @appView = new views.Dashboard
       el: $ '#main'
-
+    @business = new views.BusinessEngagement
+      el: $ '#main'
+    @dashboard = new collections.Dashboards
+      url: '/admin/dashboard/load'
   routes:
     "/settings/": "settings"
+    "/business/": "business"
     "*actions": "default"
+
+  business: ->
+    @business.render()
 
   settings: ->
     @settings.render()
 
   default: (actions) ->
-    @appView.preRender()
+    @dashboard.fetch success: () =>
+      @appView.Render()
 
 $ ->
   router = new DashboardSpace
