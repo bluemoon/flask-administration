@@ -11,7 +11,7 @@ events = require('events');
 
 tail = require('tail');
 
-test_log = '/var/log/nginx/access.log';
+test_log = '/opt/nginx/logs/access.log';
 
 Parser = (function() {
 
