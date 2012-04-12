@@ -11,7 +11,7 @@ events = require('events');
 
 tail = require('tail');
 
-test_log = '/var/log/system.log';
+test_log = '/var/log/nginx/access.log';
 
 Parser = (function() {
 
@@ -34,9 +34,7 @@ Parser = (function() {
   }
 
   Parser.prototype.onParse = function(line) {
-    var test_line;
-    test_line = '124.115.0.139 - - [25/Mar/2012:19:29:22 +0000] "GET / HTTP/1.1" 200 1116 "-" "Sosospider+(+http://help.soso.com/webspider.htm)"';
-    return console.log(this.nginx(test_line));
+    return console.log(this.nginx(line));
   };
 
   return Parser;
